@@ -8,11 +8,14 @@
 * Delitev dela
 
 ## 3. teden
-* Programiranje igre
+* Programiranje igre (programiranje, testiranje, dokumentiranje)
 
 ## 4. teden
-* Programiranje grafičnega vmesnika
+* Programiranje grafičnega vmesnika (programiranje, testiranje, dokumentiranje)
 
 ## 5. teden
 * Končno testiranje in popravki
 * Generiranje dokumentacije
+
+## 6. teden
+* Priprava na zagovor

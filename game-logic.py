@@ -11,3 +11,29 @@ class Igra():
         self.trojke = [{0, 1, 2}, {3, 4, 5}, {6, 7, 8}, {9, 10, 11}, {12, 13, 14}, {15, 16, 17}, {18, 19, 20},
                        {21, 22, 23}, {0, 9, 21}, {3, 10, 18}, {6, 11, 15}, {1, 4, 7}, {16, 19, 22}, {8, 12, 17},
                        {5, 13, 20}, {2, 14, 23}]
+        self.zetoni = [None] * 18
+        self.faza_igre = 1
+
+    def veljavna_poteza(self, zeton, zeljeno_polje):
+        """Dobi index žetona, fazo igre (1-3) in index polja kamor želimo žeton postaviti"""
+        if self.na_potezi is IGRALEC_1 and zeton >= 9 or self.na_potezi is IGRALEC_2 and zeton < 9:
+            return False
+        if self.faza_igre == 1:
+            return self.igralna_plosca[zeljeno_polje] is None and self.zetoni[zeton] is None
+        elif self.faza_igre == 2:
+            return self.igralna_plosca[zeljeno_polje] is None and zeljeno_polje in self.sosedi[self.zetoni[zeton]]
+        elif self.faza_igre == 3:
+            if self.na_potezi is IGRALEC_1:
+                if self.zetoni[:9].count(False) >= 6:
+                    return self.igralna_plosca is None
+                else:
+                    return self.igralna_plosca[zeljeno_polje] is None and zeljeno_polje in\
+                                                                          self.sosedi[self.zetoni[zeton]]
+            else:
+                if self.zetoni[9:].count(False) >= 6:
+                    return self.igralna_plosca is None
+                else:
+                    return self.igralna_plosca[zeljeno_polje] is None and zeljeno_polje in\
+                                                                          self.sosedi[self.zetoni[zeton]]
+        else:
+            return False

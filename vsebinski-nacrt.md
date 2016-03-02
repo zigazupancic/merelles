@@ -21,12 +21,15 @@ Metode:
 * `veljavna_poteza(self, zeton, zeljeno_polje)`: preveri, če dani žeton lahko postavimo na želeno polje glede na fazo igre
 * `veljavne_poteze(self)`: vrne seznam vseh možnih potez igralca na potezi
 * `stanje_igre(self)`: preveri v katerem stanju je igra - v kateri fazi (postavljanje žetonov, premikanje žetonov) ali konec igre
-* `odigraj_potezo(self, zeton, polje)`: ustrezno posodobi podatke o žetonih in igralni plošči, po potrebi pokliče metodo `jemlji_zeton` ter zamenja igralca na potezi, nato pokliče `stanje_igre`
-* `jemlji_zeton(self, zeton)` ustrezno posodbi podatke o žetonih in igralni plošči
+* `odigraj_potezo(self, zeton, polje)`: ustrezno posodobi podatke o žetonih in igralni plošči, sicer pokliče `zakljucek_poteze`
+* `zakljucek_poteze(self, zeton)`: če je potrebno vzeti žeton ustrezno posodbi podatke o žetonih in igralni plošči ter pokliče metodo `stanje_igre`
 
-#### Razred `Clovek`
-
-#### Razred `Racunalnik`
+#### Razreda `Clovek` in `Racunalnik`
+Metode:
+* `igraj(self)`: GUI pokliče metodo, ko je igralec na potezi
+* `klik(self, koordinata, objekt)`: ko igralec klikne na ploščo, objekt je žeton ali polje na plošči
+Atributi:
+* `faza_poteze`: pove v kateri fazi poteze je igralec (izberi žeton za premik, izberi polje, izberi nasprotnikov žeton)
 
 # Grafični vmesnik
 * Ob zagonu igre se pojavi izbirno okno, kjer izberemo vrsto igralca, imena ter težavnost

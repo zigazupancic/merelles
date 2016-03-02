@@ -3,13 +3,14 @@
 Ob zagonu aplikacije se odpre okno z igralno ploščo in igra se začne s privzetimi nastavitvami (ČLOVEK - ČLOVEK). Če želimo drugačne nastavitve, v meniju izberemo `Nova igra`. Človek premika poteze s klikom na žeton in nato na polje, kamor ga želi postaviti. 
 
 Aplikacija je lahko v enem od treh stanj:
-1 Nastavljanje nove igre
+
+1. Nastavljanje nove igre
   * Izbira vrste igralcev
   * Težavnost igralca RAČUNALNIK, če je izbran
   * Imena igralcev
-2 Igranje
+2. Igranje
   * Na plošči so vidni aktivni žetoni ter informacije o igri (kdo je na potezi in kaj mora narediti)
-3 Konec igre
+3. Konec igre
   * Izpiše se ime zmagovalca
 
 ## Struktura programa

@@ -78,8 +78,8 @@ class Igra():
                 return not self.nova_trojka(zeton)
     
     def odigraj_potezo(self, zeton, polje):
-        """Sprejme indeks zetona in polje, kamor ga zelimo prestaviti."""
-        """Privzamemo, da je poteza veljavna - veljavnost bo preveril GUI, preden poklice to metodo"""
+        """Sprejme indeks zetona in polje, kamor ga zelimo prestaviti.
+        Privzamemo, da je poteza veljavna - veljavnost bo preveril GUI, preden poklice to metodo"""
         if self.zetoni[zeton] is None:
             #zeton prvic vstopi v igro
             self.zetoni[zeton] = polje
@@ -108,8 +108,8 @@ class Igra():
             return False
 
     def zakljucek_poteze(self, zeton=None):
-        """Sprejme indeks zetona, ki ga zelimo vzeti - veljavnost te poteze bo ze prej preveril GUI."""
-        """Privzeti parameter None pove, da ne bomo vzeli nobenega zetona"""
+        """Sprejme indeks zetona, ki ga zelimo vzeti - veljavnost te poteze bo ze prej preveril GUI.
+        Privzeti parameter None pove, da ne bomo vzeli nobenega zetona"""
         if zeton is not None:
             self.igralna_plosca[self.zetoni[zeton]] = None
             self.zetoni[zeton] = False
@@ -122,8 +122,9 @@ class Igra():
         self.stanje_igre()
     
     def veljavne_poteze(self):
-        """Vrne seznam parov (i, n), kjer je i indeks zetona, ki ga lahko prestavimo, in n polje na plosci, kamor ga lahko prestavimo, da bo poteza veljavna"""
-        """Dokler zetone samo postavljamo na plosco, lahko postavimo samo tistega z najnizjim indeksom"""
+        """Vrne seznam parov (i, n), kjer je i indeks zetona, ki ga lahko prestavimo, in n polje na plosci, kamor ga
+        lahko prestavimo, da bo poteza veljavna.
+        Dokler zetone samo postavljamo na plosco, lahko postavimo samo tistega z najnizjim indeksom"""
         prazna_polja = [i for i in range(24) if self.igralna_plosca is None]
         if self.na_potezi is IGRALEC_1:
             poteze = []

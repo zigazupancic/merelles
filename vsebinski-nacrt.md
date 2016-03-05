@@ -42,17 +42,3 @@ Metode:
 * `klik(self, koordinata, objekt)`: ko igralec klikne na ploščo, objekt ustrezno ukrepa (spremeni fazo poteze ali pokliče `povleci_potezo`), objekt je žeton ali polje na plošči
 Atributi:
 * `faza_poteze`: pove v kateri fazi poteze je igralec (izberi žeton za premik, izberi polje, izberi nasprotnikov žeton)
-
-# Grafični vmesnik
-* Ob zagonu igre se pojavi plošča in igra je začeta s privzetimi nastavitvami
-* Na canvasu je izrisana igralna plošča s prostorom za žetone pri strani, nad žetoni ime in vrsta igralca
-* Na vrhu vmesnika je ime igre in pod njim polje z informacijami o igri
-* Vsak žeton ima svoje koordinate
-* Vsako križišče ima navidezen krog, v katerem se žeton "prilepi" na križišče, če je v njem izpuščen
-* Križišča so predstavljena s številko 0-23
-* Žetoni se premikajo z vlečenjem miške
-* Možne trojke so predstavljene s seznamom
-* Sosedi vsakega križišča so zapisani v seznamu
-* Pri preverjanju legalne poteze se preveri seznam sosedov križišča in prosta polja
-
-

@@ -5,4 +5,5 @@ Mlin je igra za dva igralca, ki se igra na posebni igralni plošči. Vsak igrale
 
 Podrobnejši opis igre se nahaja na [tem naslovu](https://en.wikipedia.org/wiki/Nine_Men%27s_Morris).
 Igralna plošča izgleda takole:
+ 
 ![igralna plosca](https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/Nine_Men's_Morris_board.svg/220px-Nine_Men's_Morris_board.svg.png)

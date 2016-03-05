@@ -25,26 +25,20 @@ Metode:
 * `odigraj_potezo(self, zeton, polje)`: ustrezno posodobi podatke o žetonih in igralni plošči, sicer pokliče `zakljucek_poteze`
 * `zakljucek_poteze(self, zeton)`: če je potrebno vzeti žeton ustrezno posodbi podatke o žetonih in igralni plošči ter pokliče metodo `stanje_igre`
 
+### Razredi grafičnega vmesnika
+#### Razred `GUI`
+Objekt ustvari igralno ploščo ter prične novo igro s privzetimi nastavitvami (pokliče se metoda `nova_igra`).
+Metode:
+* `nova_igra(self, igralec_1, igralec_2, tezavnost=3)`: ponastavi žetone na igralni plošči, ustvari objekta razredov `igralec_1` in `igralec_2` ter objekt razreda `Igra`
+* `koncaj_igro(self, zmagovalec=None)`: konča igro in izpiše zamgovalca
+* `prestavi_zeton(self, zeton, polje)`: prestavi žeton na izbrano polje
+* `odstrani_zeton(self, zeton)`: odstrani žeton iz igralnega polja
+* `klik(self, event)`: objektu igralca, ki je na potezi povemo, da je uporabnik kliknil na ploščo in vrnemo (koordinata, objekt), kjer je objekt žeton ali polje (odvisno na kaj je kliknil)
+* `povleci_potezo(self, vrsta_poteze, zeton, polje=None)`: premaknemo žeton na polje, oziroma vzamemo žeton, odvisno od vrste poteze
+
 #### Razreda `Clovek` in `Racunalnik`
 Metode:
 * `igraj(self)`: GUI pokliče metodo, ko je igralec na potezi
-* `klik(self, koordinata, objekt)`: ko igralec klikne na ploščo, objekt je žeton ali polje na plošči
+* `klik(self, koordinata, objekt)`: ko igralec klikne na ploščo, objekt ustrezno ukrepa (spremeni fazo poteze ali pokliče `povleci_potezo`), objekt je žeton ali polje na plošči
 Atributi:
 * `faza_poteze`: pove v kateri fazi poteze je igralec (izberi žeton za premik, izberi polje, izberi nasprotnikov žeton)
-
-### Razredi grafičnega vmesnika
-#### Razred `GUI`
-Objekt ustvari igralno ploščo
-
-# Grafični vmesnik
-* Ob zagonu igre se pojavi izbirno okno, kjer izberemo vrsto igralca, imena ter težavnost
-* Ozadje: slika igralne plošče s prostorom za žetone pri strani, nad žetoni ime in vrsta igralca
-* Vsak žeton ima svoje koordinate
-* Vsako križišče ima navidezen krog, v katerem se žeton "prilepi" na križišče, če je v njem izpuščen
-* Križišča so predstavljena s številko 0-23
-* Žetoni se premikajo z vlečenjem miške
-* Možne trojke so predstavljene s seznamom
-* Sosedi vsakega križišča so zapisani v seznamu
-* Pri preverjanju legalne poteze se preveri seznam sosedov križišča in prosta polja
-
-

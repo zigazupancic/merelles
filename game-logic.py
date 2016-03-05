@@ -89,7 +89,7 @@ class Igra():
             self.igralna_plosca[self.zetoni[zeton]] = None
             self.igralna_plosca[polje] = zeton
             self.zetoni[zeton] = polje
-        if not nova_trojka(self, zeton):
+        if not self.nova_trojka(self, zeton):
             #ni nastala nova trojka
             self.zakljucek_poteze(zeton=None)
 

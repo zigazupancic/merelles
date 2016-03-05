@@ -86,7 +86,18 @@ class Igra():
             return False
 
     def zakljucek_poteze(self, zeton=None):
-        pass
+        """Sprejme indeks zetona, ki ga zelimo vzeti - veljavnost te poteze bo ze prej preveril GUI."""
+        """Privzeti parameter None pove, da ne bomo vzeli nobenega zetona"""
+        if zeton is not None:
+            self.igralna_plosca[self.zetoni[zeton]] = None
+            self.zetoni[zeton] = False
+        #spremenimo igralca
+        if self.na_potezi is IGRALEC_1:
+            self.na_potezi = IGRALEC_2
+        else:
+            self.na_potezi = IGRALEC_1
+        #poklicemo stanje igre
+        self.stanje_igre()
     
     def veljavne_poteze(self):
         pass

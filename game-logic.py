@@ -11,19 +11,25 @@ class Igra():
         self.trojke = [{0, 1, 2}, {3, 4, 5}, {6, 7, 8}, {9, 10, 11}, {12, 13, 14}, {15, 16, 17}, {18, 19, 20},
                        {21, 22, 23}, {0, 9, 21}, {3, 10, 18}, {6, 11, 15}, {1, 4, 7}, {16, 19, 22}, {8, 12, 17},
                        {5, 13, 20}, {2, 14, 23}]
+        #v seznamu self.zetoni ustreza indeks i zetonu i: None - ni se vstopil v igro, False - je ze izlocen iz igre, n - nahaja se na igralni plosci
+        #na mestu n
+        #indeksi 0-8 so za zetone igralca 1, ostali za zetone igralca 2
         self.zetoni = [None] * 18
+        #faza_igre 1 pomeni, da se zetoni sele postavljajo na plosco
+        #faza_igre 2 pomeni, da se zetoni prestavljajo po plosci
         self.faza_igre = 1
 
     def veljavna_poteza(self, zeton, zeljeno_polje):
-        """Dobi index žetona, fazo igre (1-3) in index polja kamor želimo žeton postaviti"""
+        """Dobi index zetona, fazo igre (1-2) in index polja kamor zelimo zeton postaviti"""
+        if self.zetoni[zeton] is False:
+            return False
         if self.na_potezi is IGRALEC_1 and zeton >= 9 or self.na_potezi is IGRALEC_2 and zeton < 9:
             return False
         if self.faza_igre == 1:
             return self.igralna_plosca[zeljeno_polje] is None and self.zetoni[zeton] is None
         elif self.faza_igre == 2:
-            return self.igralna_plosca[zeljeno_polje] is None and zeljeno_polje in self.sosedi[self.zetoni[zeton]]
-        elif self.faza_igre == 3:
             if self.na_potezi is IGRALEC_1:
+                #preverimo, ce ima igralec samo se 2 ali 3 aktivne zetone - potem lahko skace po plosci
                 if self.zetoni[:9].count(False) >= 6:
                     return self.igralna_plosca is None
                 else:

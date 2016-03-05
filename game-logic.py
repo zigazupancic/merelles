@@ -122,10 +122,47 @@ class Igra():
         self.stanje_igre()
     
     def veljavne_poteze(self):
-        pass
+        """Vrne seznam parov (i, n), kjer je i indeks zetona, ki ga lahko prestavimo, in n polje na plosci, kamor ga lahko prestavimo, da bo poteza veljavna"""
+        """Dokler zetone samo postavljamo na plosco, lahko postavimo samo tistega z najnizjim indeksom"""
+        prazna_polja = [i for i in range(24) if self.igralna_plosca is None]
+        if self.na_potezi is IGRALEC_1:
+            poteze = []
+            #obstajajo zetoni, ki se niso bili postavljeni na plosco
+            if self.zetoni[:9].count(None) != 0:
+                najnizji_index = self.zetoni[:9].index(None)
+                for polje in prazna_polja:
+                    poteze.append((najnizji_index, polje))
+                return poteze
+            #vsi zetoni se ze nahajajo na plosci (nobeden nima statusa None)
+            else:
+                for i in range(9):
+                    #zeton (oznacuje pozicijo na plosci) je se v igri
+                    if self.zetoni[i] != False:
+                        for sosed in self.sosedi[self.zetoni[i]]:
+                            if sosed in prazna_polja:
+                                poteze.append((i, sosed))
+                return poteze
+        else:
+            poteze = []
+            #obstajajo zetoni, ki se niso bili postavljeni na plosco
+            if self.zetoni[9:].count(None) != 0:
+                najnizji_index = self.zetoni[:9].index(None) + 9
+                for polje in prazna_polja:
+                    poteze.append((najnizji_index, polje))
+                return poteze
+            #vsi zetoni se ze nahajajo na plosci (nobeden nima statusa None)
+            else:
+                for i in range(9, 18):
+                    #zeton (oznacuje pozicijo na plosci) je se v igri
+                    if self.zetoni[i] != False:
+                        for sosed in self.sosedi[self.zetoni[i]]:
+                            if sosed in prazna_polja:
+                                poteze.append((i, sosed))
+                return poteze
 
     def veljavni_zakljucki(self):
-        pass
+        """Vrne seznam indeksov zetonov, ki jih lahko vzamemo s plosce"""
+        return [indeks for indeks in range(24) if self.veljavni_zakljucek(indeks)]
 
     def stanje_igre(self):
         pass

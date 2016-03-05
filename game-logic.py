@@ -165,4 +165,17 @@ class Igra():
         return [indeks for indeks in range(24) if self.veljavni_zakljucek(indeks)]
 
     def stanje_igre(self):
-        pass
+        """Ustrezno spremeni atribute faza_igre, konec_igre in zmagovalec"""
+        #vse zetone smo se polozili na plosco - pricne se premikanje zetonov po plosci
+        if self.zetoni.count(None) == 0:
+            self.faza_igre = 2
+        #igralec na potezi nima vec veljavnih potez ali pa sta mu ostala samo se 2 zetona
+        if len(self.veljavne_poteze()) == 0:
+            self.konec_igre = True
+        if self.na_potezi is IGRALEC_1 and self.zetoni[:9].count(False) >= 7:
+            self.konec_igre = True
+            self.zmagovalec = IGRALEC_2
+        if self.na_potezi is IGRALEC_2 and self.zetoni[9:].count(False) >= 7:
+            self.konec_igre = True
+            self.zmagovalec = IGRALEC_1
+            

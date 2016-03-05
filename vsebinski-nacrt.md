@@ -32,6 +32,10 @@ Metode:
 Atributi:
 * `faza_poteze`: pove v kateri fazi poteze je igralec (izberi žeton za premik, izberi polje, izberi nasprotnikov žeton)
 
+### Razredi grafičnega vmesnika
+#### Razred `GUI`
+Objekt ustvari igralno ploščo
+
 # Grafični vmesnik
 * Ob zagonu igre se pojavi izbirno okno, kjer izberemo vrsto igralca, imena ter težavnost
 * Ozadje: slika igralne plošče s prostorom za žetone pri strani, nad žetoni ime in vrsta igralca

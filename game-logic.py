@@ -53,7 +53,29 @@ class Igra():
             return False
 
     def veljavni_zakljucek(self, zeton):
-        pass
+        """Dobi indeks zetona, ki ga zelimo vzeti in preveri, ce je to veljavno"""
+        if self.na_potezi is IGRALEC_1:
+            #indeksi nasprotnikovih zetonov, ki se nahajajo na plosci (nimajo statusa False ali None)
+            izbire = [i for i in range(9, 18) if self.zetoni[i] not in [False, None]]
+            if zeton not in izbire:
+                return False
+            ali_so_v_trojki = [self.nova_trojka(i) for i in izbire]
+            #ce so vsi v trojkah, si lahko izbere kateregakoli s plosce
+            if ali_so_v_trojki.count(True) == len(ali_so_v_trojki):
+                return True
+            else:
+                return not self.nova_trojka(zeton)
+        else:
+            #indeksi nasprotnikovih zetonov, ki se nahajajo na plosci (nimajo statusa False ali None)
+            izbire = [i for i in range(9) if self.zetoni[i] not in [False, None]]
+            if zeton not in izbire:
+                return False
+            ali_so_v_trojki = [self.nova_trojka(i) for i in izbire]
+            #ce so vsi v trojkah, si lahko izbere kateregakoli s plosce
+            if ali_so_v_trojki.count(True) == len(ali_so_v_trojki):
+                return True
+            else:
+                return not self.nova_trojka(zeton)
     
     def odigraj_potezo(self, zeton, polje):
         """Sprejme indeks zetona in polje, kamor ga zelimo prestaviti."""

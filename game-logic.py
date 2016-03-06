@@ -22,6 +22,8 @@ class Igra():
         #faza_igre 1 pomeni, da se zetoni sele postavljajo na plosco
         #faza_igre 2 pomeni, da se zetoni prestavljajo po plosci
         self.faza_igre = 1
+        #pove, ce se je zakljucila poteza
+        self.konec_poteze = False
         #pove, ce se je igra koncala
         self.konec_igre = False
         #pove, kdo je zmagovalec igre
@@ -118,6 +120,8 @@ class Igra():
             self.na_potezi = IGRALEC_2
         else:
             self.na_potezi = IGRALEC_1
+        #povemo, da se je poteza zakljucila
+        self.konec_poteze = True
         #poklicemo stanje igre
         self.stanje_igre()
     
@@ -171,12 +175,10 @@ class Igra():
         if self.zetoni.count(None) == 0:
             self.faza_igre = 2
         #igralec na potezi nima vec veljavnih potez ali pa sta mu ostala samo se 2 zetona
-        if len(self.veljavne_poteze()) == 0:
-            self.konec_igre = True
-        if self.na_potezi is IGRALEC_1 and self.zetoni[:9].count(False) >= 7:
+        if self.na_potezi is IGRALEC_1 and (self.zetoni[:9].count(False) >= 7 or len(self.veljavne_poteze()) == 0):
             self.konec_igre = True
             self.zmagovalec = IGRALEC_2
-        if self.na_potezi is IGRALEC_2 and self.zetoni[9:].count(False) >= 7:
+        if self.na_potezi is IGRALEC_2 and (self.zetoni[9:].count(False) >= 7 or len(self.veljavne_poteze()) == 0):
             self.konec_igre = True
             self.zmagovalec = IGRALEC_1
             

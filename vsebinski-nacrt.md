@@ -33,7 +33,7 @@ Metode:
 * `koncaj_igro(self, zmagovalec=None)`: konča igro in izpiše zamgovalca
 * `prestavi_zeton(self, zeton, polje)`: prestavi žeton na izbrano polje
 * `odstrani_zeton(self, zeton)`: odstrani žeton iz igralnega polja
-* `klik(self, event)`: objektu igralca, ki je na potezi povemo, da je uporabnik kliknil na ploščo in vrnemo (koordinata, objekt), kjer je objekt žeton ali polje (odvisno na kaj je kliknil)
+* `klik_na_plosco(self, event)`: objektu igralca, ki je na potezi povemo, da je uporabnik kliknil na ploščo in vrnemo (koordinata, objekt), kjer je objekt žeton ali polje (odvisno na kaj je kliknil)
 * `povleci_potezo(self, vrsta_poteze, zeton, polje=None)`: premaknemo žeton na polje, oziroma vzamemo žeton, odvisno od vrste poteze
 
 #### Razreda `Clovek` in `Racunalnik`

@@ -89,6 +89,9 @@ class GUI():
         new_game.title("Nova igra")
 
     def nova_igra(self, igralec_1, igralec_2, tezavnost=3):
+        # Nariši žetone, pobriši žetone na plošči
+        # self.plosca.create_oval(35, 630, 95, 690, fill="black", tags="zeton-1")
+        # self.plosca.create_oval(135, 630, 195, 690, fill="black")
         pass
 
     def koncaj_igro(self, zmagovalec=None):
@@ -109,6 +112,8 @@ class GUI():
             y_koordinata = round(event.y, -2) - 40
 
         if abs(x_koordinata - event.x) ** 2 + abs(y_koordinata - event.y) ** 2 <= polmer_klika ** 2:
+            pass
+
             # TODO: poklici objekt igralca, ki je na potezi in mu povej, kaj je bilo kliknjeno
 
     def povleci_potezo(self, vrsta_poteze, zeton, polje=None):

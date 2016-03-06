@@ -26,56 +26,62 @@ class GUI():
         menu_pomoc.add_command(label="Kako igrati")  # TODO: Implementiraj okno z navodili za igro
         menu_pomoc.add_command(label="O igri")  # TODO: Implementiraj okno z informacijami o igri
 
-        # Ustvari platno in ga postavi v okno
-        self.platno = tk.Canvas(master, width=1200, height=750)
-        self.platno.grid(row=1, column=1)
+        # Ustvari platno plosca in ga postavi v okno
+        self.plosca = tk.Canvas(master, width=1200, height=750)
+        self.plosca.grid(row=1, column=1)
 
         # Ozadje plošče
-        self.platno.create_rectangle(250, 10, 950, 710, fill="beige", width=0)
+        self.plosca.create_rectangle(250, 10, 950, 710, fill="beige", width=0)
 
         # igralna plošča
         # ---------------------------------------------------------
         # Okvir
-        self.platno.create_rectangle(300, 60, 900, 660, width=6)
-        self.platno.create_rectangle(400, 160, 800, 560, width=6)
-        self.platno.create_rectangle(500, 260, 700, 460, width=6)
+        self.plosca.create_rectangle(300, 60, 900, 660, width=6)
+        self.plosca.create_rectangle(400, 160, 800, 560, width=6)
+        self.plosca.create_rectangle(500, 260, 700, 460, width=6)
 
-        self.platno.create_line(600, 60, 600, 260, width=6)
-        self.platno.create_line(600, 460, 600, 660, width=6)
-        self.platno.create_line(300, 360, 500, 360, width=6)
-        self.platno.create_line(700, 360, 900, 360, width=6)
+        self.plosca.create_line(600, 60, 600, 260, width=6)
+        self.plosca.create_line(600, 460, 600, 660, width=6)
+        self.plosca.create_line(300, 360, 500, 360, width=6)
+        self.plosca.create_line(700, 360, 900, 360, width=6)
 
         # Polja
-        self.platno.create_oval(285, 45, 315, 75, fill="black")
-        self.platno.create_oval(285, 345, 315, 375, fill="black")
-        self.platno.create_oval(285, 645, 315, 675, fill="black")
-        self.platno.create_oval(885, 45, 915, 75, fill="black")
-        self.platno.create_oval(885, 345, 915, 375, fill="black")
-        self.platno.create_oval(885, 645, 915, 675, fill="black")
-        self.platno.create_oval(585, 45, 615, 75, fill="black")
-        self.platno.create_oval(585, 645, 615, 675, fill="black")
+        self.plosca.create_oval(285, 45, 315, 75, fill="black")
+        self.plosca.create_oval(285, 345, 315, 375, fill="black")
+        self.plosca.create_oval(285, 645, 315, 675, fill="black")
+        self.plosca.create_oval(885, 45, 915, 75, fill="black")
+        self.plosca.create_oval(885, 345, 915, 375, fill="black")
+        self.plosca.create_oval(885, 645, 915, 675, fill="black")
+        self.plosca.create_oval(585, 45, 615, 75, fill="black")
+        self.plosca.create_oval(585, 645, 615, 675, fill="black")
 
-        self.platno.create_oval(385, 145, 415, 175, fill="black")
-        self.platno.create_oval(385, 345, 415, 375, fill="black")
-        self.platno.create_oval(385, 545, 415, 575, fill="black")
-        self.platno.create_oval(785, 145, 815, 175, fill="black")
-        self.platno.create_oval(785, 345, 815, 375, fill="black")
-        self.platno.create_oval(785, 545, 815, 575, fill="black")
-        self.platno.create_oval(585, 145, 615, 175, fill="black")
-        self.platno.create_oval(585, 545, 615, 575, fill="black")
+        self.plosca.create_oval(385, 145, 415, 175, fill="black")
+        self.plosca.create_oval(385, 345, 415, 375, fill="black")
+        self.plosca.create_oval(385, 545, 415, 575, fill="black")
+        self.plosca.create_oval(785, 145, 815, 175, fill="black")
+        self.plosca.create_oval(785, 345, 815, 375, fill="black")
+        self.plosca.create_oval(785, 545, 815, 575, fill="black")
+        self.plosca.create_oval(585, 145, 615, 175, fill="black")
+        self.plosca.create_oval(585, 545, 615, 575, fill="black")
 
-        self.platno.create_oval(485, 245, 515, 275, fill="black")
-        self.platno.create_oval(485, 345, 515, 375, fill="black")
-        self.platno.create_oval(485, 445, 515, 475, fill="black")
-        self.platno.create_oval(685, 245, 715, 275, fill="black")
-        self.platno.create_oval(685, 345, 715, 375, fill="black")
-        self.platno.create_oval(685, 445, 715, 475, fill="black")
-        self.platno.create_oval(585, 245, 615, 275, fill="black")
-        self.platno.create_oval(585, 445, 615, 475, fill="black")
+        self.plosca.create_oval(485, 245, 515, 275, fill="black")
+        self.plosca.create_oval(485, 345, 515, 375, fill="black")
+        self.plosca.create_oval(485, 445, 515, 475, fill="black")
+        self.plosca.create_oval(685, 245, 715, 275, fill="black")
+        self.plosca.create_oval(685, 345, 715, 375, fill="black")
+        self.plosca.create_oval(685, 445, 715, 475, fill="black")
+        self.plosca.create_oval(585, 245, 615, 275, fill="black")
+        self.plosca.create_oval(585, 445, 615, 475, fill="black")
         # ---------------------------------------------------------
 
+        # Povezava koordinat platna in koordinat polj na plosci
+        self.koordinate = {(300, 60): 0, (600, 60): 1, (900, 60): 2, (400, 160): 3, (600, 160): 4, (800, 160): 5,
+                           (500, 260): 6, (600, 260): 7, (700, 260): 8, (300, 360): 9, (400, 360): 10, (500, 360): 11,
+                           (700, 360): 12, (800, 360): 13, (900, 360): 14, (500, 460): 15, (600, 460): 16,
+                           (700, 460): 17, (400, 560): 18, (600, 560): 19, (800, 560): 20, (300, 660): 21,
+                           (600, 660): 22, (900, 660): 23}
 
-        # TODO: Ob kliku kliči funkcijo klik
+        self.plosca.bind("<Button-1>", self.klik_na_plosco)
         # TODO: Začni igro s privzetimi nastavitvami
 
     def izbira_nove_igre(self):
@@ -94,8 +100,16 @@ class GUI():
     def odstrani_zeton(self, zeton):
         pass
 
-    def klik(self, event):  # TODO: spremeni ime, da ne pride do zmešnjave z razredom človek in računalnik
-        pass
+    def klik_na_plosco(self, event):
+        polmer_klika = 40
+        x_koordinata = round(event.x, -2)
+        if event.y % 100 <= 50:
+            y_koordinata = round(event.y, -2) + 60
+        else:
+            y_koordinata = round(event.y, -2) - 40
+
+        if abs(x_koordinata - event.x) ** 2 + abs(y_koordinata - event.y) ** 2 <= polmer_klika ** 2:
+            # TODO: poklici objekt igralca, ki je na potezi in mu povej, kaj je bilo kliknjeno
 
     def povleci_potezo(self, vrsta_poteze, zeton, polje=None):
         pass

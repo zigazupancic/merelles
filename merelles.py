@@ -5,6 +5,8 @@ import tkinter as tk
 class GUI():
     """Razred grafičnega vmesnika, ki izriše glavno okno komunicira med uporabnikom in igro"""
 
+    # Velikost delcka plosce.
+    VELIKOST_ODSEKA = 100
     def __init__(self, master):
         """Ustvari menije in podmenije, izriše igralno ploščo in začne igro s privzetimi nastavitvami"""
 
@@ -27,59 +29,39 @@ class GUI():
         menu_pomoc.add_command(label="O igri")  # TODO: Implementiraj okno z informacijami o igri
 
         # Ustvari platno plosca in ga postavi v okno
-        self.plosca = tk.Canvas(master, width=1200, height=750)
+        d = GUI.VELIKOST_ODSEKA
+        self.plosca = tk.Canvas(master, width=12 * d, height=7.5 * d)
         self.plosca.grid(row=1, column=1)
 
         # Ozadje plošče
-        self.plosca.create_rectangle(250, 10, 950, 710, fill="beige", width=0)
+        self.plosca.create_rectangle(2.5 * d, 0.25 * d, 9.5 * d, 7.25 * d, fill="beige", width=0)
+
+        # Povezava koordinat platna in koordinat polj na plosci
+        self.koordinate = {(3 * d, 0.75 * d): 0, (6 * d, 0.75 * d): 1, (9 * d, 0.75 * d): 2, (4 * d, 1.75 * d): 3,
+                           (6 * d, 1.75 * d): 4, (8 * d, 1.75 * d): 5, (5 * d, 2.75 * d): 6, (6 * d, 2.75 * d): 7,
+                           (7 * d, 2.75 * d): 8, (3 * d, 3.75 * d): 9, (4 * d, 3.75 * d): 10, (5 * d, 3.75 * d): 11,
+                           (7 * d, 3.75 * d): 12, (8 * d, 3.75 * d): 13, (9 * d, 3.75 * d): 14, (5 * d, 4.75 * d): 15,
+                           (6 * d, 4.75 * d): 16, (7 * d, 4.75 * d): 17, (4 * d, 5.75 * d): 18, (6 * d, 5.75 * d): 19,
+                           (8 * d, 5.75 * d): 20, (3 * d, 6.75 * d): 21, (6 * d, 6.75 * d): 22, (9 * d, 6.75 * d): 23}
 
         # igralna plošča
         # ---------------------------------------------------------
         # Okvir
-        self.plosca.create_rectangle(300, 60, 900, 660, width=6)
-        self.plosca.create_rectangle(400, 160, 800, 560, width=6)
-        self.plosca.create_rectangle(500, 260, 700, 460, width=6)
+        self.plosca.create_rectangle(3 * d, 0.75 * d, 9 * d, 6.75 * d, width=0.06 * d)
+        self.plosca.create_rectangle(4 * d, 1.75 * d, 8 * d, 5.75 * d, width=0.06 * d)
+        self.plosca.create_rectangle(5 * d, 2.75 * d, 7 * d, 4.75 * d, width=0.06 * d)
 
-        self.plosca.create_line(600, 60, 600, 260, width=6)
-        self.plosca.create_line(600, 460, 600, 660, width=6)
-        self.plosca.create_line(300, 360, 500, 360, width=6)
-        self.plosca.create_line(700, 360, 900, 360, width=6)
+        self.plosca.create_line(6 * d, 0.75 * d, 6 * d, 2.75 * d, width=0.06 * d)
+        self.plosca.create_line(6 * d, 4.75 * d, 6 * d, 6.75 * d, width=0.06 * d)
+        self.plosca.create_line(3 * d, 3.75 * d, 5 * d, 3.75 * d, width=0.06 * d)
+        self.plosca.create_line(7 * d, 3.75 * d, 9 * d, 3.75 * d, width=0.06 * d)
 
         # Polja
-        self.plosca.create_oval(285, 45, 315, 75, fill="black")
-        self.plosca.create_oval(285, 345, 315, 375, fill="black")
-        self.plosca.create_oval(285, 645, 315, 675, fill="black")
-        self.plosca.create_oval(885, 45, 915, 75, fill="black")
-        self.plosca.create_oval(885, 345, 915, 375, fill="black")
-        self.plosca.create_oval(885, 645, 915, 675, fill="black")
-        self.plosca.create_oval(585, 45, 615, 75, fill="black")
-        self.plosca.create_oval(585, 645, 615, 675, fill="black")
-
-        self.plosca.create_oval(385, 145, 415, 175, fill="black")
-        self.plosca.create_oval(385, 345, 415, 375, fill="black")
-        self.plosca.create_oval(385, 545, 415, 575, fill="black")
-        self.plosca.create_oval(785, 145, 815, 175, fill="black")
-        self.plosca.create_oval(785, 345, 815, 375, fill="black")
-        self.plosca.create_oval(785, 545, 815, 575, fill="black")
-        self.plosca.create_oval(585, 145, 615, 175, fill="black")
-        self.plosca.create_oval(585, 545, 615, 575, fill="black")
-
-        self.plosca.create_oval(485, 245, 515, 275, fill="black")
-        self.plosca.create_oval(485, 345, 515, 375, fill="black")
-        self.plosca.create_oval(485, 445, 515, 475, fill="black")
-        self.plosca.create_oval(685, 245, 715, 275, fill="black")
-        self.plosca.create_oval(685, 345, 715, 375, fill="black")
-        self.plosca.create_oval(685, 445, 715, 475, fill="black")
-        self.plosca.create_oval(585, 245, 615, 275, fill="black")
-        self.plosca.create_oval(585, 445, 615, 475, fill="black")
+        for (x, y) in self.koordinate:
+            self.plosca.create_oval(x - 0.15 * d, y - 0.15 * d, x + 0.15 * d, y + 0.15 * d, fill="black")
         # ---------------------------------------------------------
 
-        # Povezava koordinat platna in koordinat polj na plosci
-        self.koordinate = {(300, 60): 0, (600, 60): 1, (900, 60): 2, (400, 160): 3, (600, 160): 4, (800, 160): 5,
-                           (500, 260): 6, (600, 260): 7, (700, 260): 8, (300, 360): 9, (400, 360): 10, (500, 360): 11,
-                           (700, 360): 12, (800, 360): 13, (900, 360): 14, (500, 460): 15, (600, 460): 16,
-                           (700, 460): 17, (400, 560): 18, (600, 560): 19, (800, 560): 20, (300, 660): 21,
-                           (600, 660): 22, (900, 660): 23}
+
 
         self.plosca.bind("<Button-1>", self.klik_na_plosco)
         # TODO: Začni igro s privzetimi nastavitvami
@@ -112,6 +94,9 @@ class GUI():
             y_koordinata = round(event.y, -2) - 40
 
         if abs(x_koordinata - event.x) ** 2 + abs(y_koordinata - event.y) ** 2 <= polmer_klika ** 2:
+            a = (x_koordinata, y_koordinata)
+            if a in self.koordinate:
+                print(self.koordinate[a])
             pass
 
             # TODO: poklici objekt igralca, ki je na potezi in mu povej, kaj je bilo kliknjeno

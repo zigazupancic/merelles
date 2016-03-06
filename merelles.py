@@ -100,6 +100,40 @@ class GUI():
     def povleci_potezo(self, vrsta_poteze, zeton, polje=None):
         pass
 
+class Clovek():
+    """Igralec razreda Clovek"""
+    
+    def __init__(self, gui):
+        """Objekt razreda Clovek povezemo z igralno plosco in naredimo atribute, ki bodo hranili klike"""
+        self.gui = gui
+        self.prvi_klik = None
+        self.drugi_klik = None
+        self.tretji_klik = None
+
+    def igraj(self):
+        """Poklice se, takoj ko pride igralec Clovek na vrsto - takrat resetiramo vse klike iz prejsnje rotacije"""
+        self.prvi_klik = None
+        self.drugi_klik = None
+        self.tretji_klik = None
+
+    def klik(self, koordinata, objekt):
+        """Sprejme koordinato in vrsto objekta in ustrezno nadaljuje igro"""
+        #prvic smo kliknili na svoj zeton ali izberemo drug svoj zeton, ki ga zelimo premakniti
+        #koordinata je indeks nasega zetona (metoda klik_na_plosco ze prej preveri, da zeton ni nasprotnikov)
+        if (self.prvi_klik is None or (self.drugi_klik, self.tretji_klik) == (None, None)) and objekt is "ZETON":
+            self.prvi_klik = koordinata
+        #koordinata sedaj predstavlja polje na igralni plosci
+        elif self.drugi_klik is None and objekt is "PLOSCA" and self.gui.igra.veljavna_poteza(self.prvi_klik, koordinata):
+            self.drugi_klik = koordinata
+            self.gui.povleci_potezo("PREMAKNI", self.prvi_klik, self.drugi_klik)
+        #koordinata je indeks nasprotnikovega zetona, ki ga zelimo vzeti
+        elif self.tretji_klik is None and self.drugi_klik is not None and objekt is "ZETON" and self.gui.igra.veljavni_zakljucek(koordinata):
+            self.tretji_klik = koordinata
+            self.gui.povleci_potezo("VZEMI", self.tretji_klik)
+
+
+
+                
 if __name__ == "__main__":
     # Ustvarimo glavno okno igre
     root = tk.Tk()

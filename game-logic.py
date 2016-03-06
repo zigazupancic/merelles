@@ -39,15 +39,15 @@ class Igra():
             return self.igralna_plosca[zeljeno_polje] is None and self.zetoni[zeton] is None
         elif self.faza_igre == 2:
             if self.na_potezi is IGRALEC_1:
-                #preverimo, ce ima igralec samo se 2 ali 3 aktivne zetone - potem lahko skace po plosci
+                # preverimo, ce ima igralec samo se 2 ali 3 aktivne zetone - potem lahko skace po plosci
                 if self.zetoni[:9].count(False) >= 6:
-                    return self.igralna_plosca is None
+                    return self.igralna_plosca[zeljeno_polje] is None
                 else:
                     return self.igralna_plosca[zeljeno_polje] is None and zeljeno_polje in\
                                                                           self.sosedi[self.zetoni[zeton]]
             else:
                 if self.zetoni[9:].count(False) >= 6:
-                    return self.igralna_plosca is None
+                    return self.igralna_plosca[zeljeno_polje] is None
                 else:
                     return self.igralna_plosca[zeljeno_polje] is None and zeljeno_polje in\
                                                                           self.sosedi[self.zetoni[zeton]]

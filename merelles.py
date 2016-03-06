@@ -117,7 +117,27 @@ class GUI():
             # TODO: poklici objekt igralca, ki je na potezi in mu povej, kaj je bilo kliknjeno
 
     def povleci_potezo(self, vrsta_poteze, zeton, polje=None):
-        pass
+        """Sprejme vrsto_poteze (PREMAKNI ali JEMLJI), zeton in po moznosti se polje (za PREMAKNI) ter odigra potezo."""
+        """Veljavnost poteze je preverila ze metoda kliik"""
+        if vrsta_poteze is "PREMAKNI":
+            self.igra.odigraj_potezo(zeton, polje)
+            self.prestavi_zeton(zeton, polje)
+        else:
+            self.igra.zakljucek_poteze(zeton)
+            self.odstrani_zeton(zeton)
+        #poteza se je zakljucila - poklicali smo zakljucek_poteze ali pa se je ta poklical sam (pri odigraj_potezo ni nastala trojka)
+        if self.igra.konec_poteze:
+            #pogledamo ali je konec igre
+            if self.igra.konec_igre:
+                self.koncaj_igro(self.igra.zmagovalec)
+            #ponastavimo konec_poteze
+            self.igra.konec_poteze = False
+            #igralcu, ki je sedaj na potezi (igralce je ze zamenjal zakljucek_poteze) povemo, naj igra
+            if self.igra.na_potezi is IGRALEC_1:
+                self.igralec_1.igraj()
+            else:
+                self.igralec_2.igraj()
+            
 
 class Clovek():
     """Igralec razreda Clovek"""

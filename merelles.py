@@ -15,6 +15,8 @@ class GUI():
         self.igralec_1 = None
         self.igralec_2 = None
         self.igra = None
+        self.ime_1 = "Rdeči"
+        self.ime_2 = "Zeleni"
 
         # Glavni meni
         menu = tk.Menu(master)
@@ -33,8 +35,8 @@ class GUI():
         menu_pomoc.add_command(label="O igri")  # TODO: Implementiraj okno z informacijami o igri
 
         # Napis igre in polje za informacije
-        self.napis = tk.StringVar(master, value="Dobrodošli v igro Merelles")
-        tk.Label(master, textvariable=self.napis).grid(row=0, column=1)
+        self.napis = tk.StringVar(self.master, value="Na potezi je {}.".format(self.ime_1))
+        tk.Label(self.master, textvariable=self.napis, font=("Helvetica", 20)).grid(row=0, column=1)
 
         # Ustvari platno plosca in ga postavi v okno
         d = GUI.VELIKOST_ODSEKA
@@ -72,38 +74,32 @@ class GUI():
         # Zetoni
         self.narisani_zetoni = []
 
-        self.new_game = None
-
         self.plosca.bind("<Button-1>", self.klik_na_plosco)
-
-        self.nova_igra(Clovek, Clovek,3)
+        self.new_game = None
+        self.nova_igra(Clovek, Clovek)
         # TODO: Začni igro s privzetimi nastavitvami
 
     def izbira_nove_igre(self):
         # Ustvari novo okno za izbiro nastavitev nove igre
-        if self.new_game is not None:
-            self.new_game.focus_set()
-            return
         self.new_game = tk.Toplevel()
-        new_game = self.new_game
-        new_game.title("Merelles - Nova igra")
-        new_game.columnconfigure(3, weight=5)
+        self.new_game.title("Merelles - Nova igra")
+        self.new_game.columnconfigure(3, weight=5)
 
-        tk.Label(new_game, text="Nastavitve nove igre", font=("Helvetica", 20)).grid(row=0, column=0, columnspan=4)
-        tk.Label(new_game, text="Izberite težavnost:").grid(row=1, column=0)
+        tk.Label(self.new_game, text="Nastavitve nove igre", font=("Helvetica", 20)).grid(row=0, column=0, columnspan=4)
+        tk.Label(self.new_game, text="Izberite težavnost:").grid(row=1, column=0)
 
         tezavnosti = [("Težko", 3), ("Srednje", 2), ("Lahko", 1)]
         izbrana_tezavnost = tk.IntVar()
         izbrana_tezavnost.set(2)
         for vrstica, (besedilo, vrednost) in enumerate(tezavnosti):
-            tk.Radiobutton(new_game, text=besedilo, variable=izbrana_tezavnost, value=vrednost, width=10, anchor="w")\
+            tk.Radiobutton(self.new_game, text=besedilo, variable=izbrana_tezavnost, value=vrednost, width=10, anchor="w")\
                 .grid(row=vrstica + 2, column=1)
 
-        tk.Label(new_game, text="IGRALEC 1", font=("Helvetica", 13)).grid(row=5, column=0, columnspan=2)
-        tk.Label(new_game, text="IGRALEC 2", font=("Helvetica", 13)).grid(row=5, column=2, columnspan=2)
+        tk.Label(self.new_game, text="IGRALEC 1", font=("Helvetica", 13)).grid(row=5, column=0, columnspan=2)
+        tk.Label(self.new_game, text="IGRALEC 2", font=("Helvetica", 13)).grid(row=5, column=2, columnspan=2)
 
-        tk.Label(new_game, text="Vrsta igralca:").grid(row=6, column=0, rowspan=2)
-        tk.Label(new_game, text="Vrsta igralca:").grid(row=6, column=2, rowspan=2)
+        tk.Label(self.new_game, text="Vrsta igralca:").grid(row=6, column=0, rowspan=2)
+        tk.Label(self.new_game, text="Vrsta igralca:").grid(row=6, column=2, rowspan=2)
 
         igralec_1_clovek = tk.BooleanVar()
         igralec_1_clovek.set(True)
@@ -113,25 +109,41 @@ class GUI():
                    ("Človek", True, igralec_2_clovek, 6, 3), ("Računalnik", False, igralec_2_clovek, 7, 3)]
 
         for besedilo, vrednost, spremenljivka, vrstica, stolpec in igralci:
-            tk.Radiobutton(new_game, text=besedilo, variable=spremenljivka, value=vrednost, width=10, anchor="w")\
+            tk.Radiobutton(self.new_game, text=besedilo, variable=spremenljivka, value=vrednost, width=10, anchor="w")\
                 .grid(row=vrstica, column=stolpec)
 
-        tk.Label(new_game, text="Ime igralca:").grid(row=8, column=0)
-        tk.Label(new_game, text="Ime igralca:").grid(row=8, column=2)
+        tk.Label(self.new_game, text="Ime igralca:").grid(row=8, column=0)
+        tk.Label(self.new_game, text="Ime igralca:").grid(row=8, column=2)
 
-        ime_1 = tk.Entry(new_game)
+        ime_1 = tk.Entry(self.new_game)
         ime_1.grid(row=8, column=1)
-        ime_1.insert(0, "Igralec 1")
-        ime_2 = tk.Entry(new_game)
+        ime_1.insert(0, self.ime_1)
+        ime_2 = tk.Entry(self.new_game)
         ime_2.grid(row=8, column=3)
-        ime_2.insert(0, "Igralec 2")
+        ime_2.insert(0, self.ime_2)
+
+        def ustvari_igro():
+            self.ime_1 = ime_1.get()
+            self.ime_2 = ime_2.get()
+            if igralec_1_clovek.get():
+                igralec_1 = Clovek
+            else:
+                igralec_1 = Racunalnik
+            if igralec_2_clovek.get():
+                igralec_2 = Clovek
+            else:
+                igralec_2 = Racunalnik
+            self.nova_igra(igralec_1, igralec_2, izbrana_tezavnost.get())
+            self.new_game.destroy()
+
+        tk.Button(self.new_game, text="Začni igro", command=lambda: ustvari_igro()).grid(row=9, column=3)
+
 
     def nova_igra(self, igralec_1, igralec_2, tezavnost=2):
-
         d = GUI.VELIKOST_ODSEKA
 
-        self.igralec_1 = igralec_1(self)
-        self.igralec_2 = igralec_2(self)
+        self.igralec_1 = igralec_1(self, tezavnost)
+        self.igralec_2 = igralec_2(self, tezavnost)
         self.igra = game_logic.Igra()
 
         self.plosca.delete("zeton")
@@ -148,7 +160,7 @@ class GUI():
              self.narisani_zetoni.append(self.plosca.create_oval(0.625*d - 0.3*d + 9.5 * d, 6.3 * d - 0.3 * d - d * zeton, 0.625 * d + 0.3 * d + 9.5*d, 6.3 * d + 0.3 * d - d * zeton, fill="green", tags="zeton", state="normal"))
         for zeton in range(4):
              self.narisani_zetoni.append(self.plosca.create_oval(1.875 * d - 0.3 * d + 9.5 * d, 6.3 * d - 0.3 * d - d * zeton, 1.875 * d + 0.3 * d + 9.5*d, 6.3 * d + 0.3 * d - d * zeton, fill="green", tags="zeton", state="normal"))
-
+        self.napis.set("Na potezi je {}.".format(self.ime_1))
 
     def koncaj_igro(self, zmagovalec=None):
         pass
@@ -159,8 +171,7 @@ class GUI():
             if koordinata == polje:
                 a, b, c, d = self.plosca.coords(self.narisani_zetoni[zeton])
                 self.plosca.move(self.narisani_zetoni[zeton], x - a - 0.3 * GUI.VELIKOST_ODSEKA, y - b - 0.3 * GUI.VELIKOST_ODSEKA)
-                return True
-        return False
+                return
 
     def odstrani_zeton(self, zeton):
         self.plosca.itemconfig(self.narisani_zetoni[zeton], state="hidden")
@@ -209,15 +220,25 @@ class GUI():
             self.igra.konec_poteze = False
             #igralcu, ki je sedaj na potezi (igralce je ze zamenjal zakljucek_poteze) povemo, naj igra
             if self.igra.na_potezi is game_logic.IGRALEC_1:
+                self.napis.set("Na potezi je {}.".format(self.ime_1))
                 self.igralec_1.igraj()
             else:
+                self.napis.set("Na potezi je {}.".format(self.ime_2))
                 self.igralec_2.igraj()
+        else:
+            if self.igra.na_potezi == game_logic.IGRALEC_1:
+                ime = self.ime_1
+                nasprotnik = self.ime_2
+            else:
+                ime = self.ime_2
+                nasprotnik = self.ime_1
+            self.napis.set("{}, vzemi žeton igralca {}.".format(ime, nasprotnik))
             
 
 class Clovek():
     """Igralec razreda Clovek"""
     
-    def __init__(self, gui):
+    def __init__(self, gui, tezavnost):
         """Objekt razreda Clovek povezemo z igralno plosco in naredimo atribute, ki bodo hranili klike"""
         self.gui = gui
         self.prvi_klik = None
@@ -248,9 +269,10 @@ class Clovek():
 class Racunalnik():
     """Igralec razreda Racunalnik"""
 
-    def __init__(self, gui):
+    def __init__(self, gui, tezavnost):
         """Objekt razreda Racunalnik povezemo z igralno plosco"""
         self.gui = gui
+        self.tezavnost = tezavnost
 
     def igraj(self):
         """Poklice se, takoj ko pride igralec Racunalnik na vrsto"""

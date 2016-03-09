@@ -163,10 +163,13 @@ class GUI():
         self.napis.set("Na potezi je {}.".format(self.ime_1))
 
     def koncaj_igro(self, zmagovalec=None):
-        pass
+        if zmagovalec is game_logic.IGRALEC_1:
+            self.napis.set("Zmagovalec je {}. Nova igra?".format(self.ime_1))
+        elif zmagovalec is game_logic.IGRALEC_2:
+            self.napis.set("Zmagovalec je {}. Nova igra?".format(self.ime_2))
+        self.plosca.itemconfig("zeton", state="disabled")
 
     def prestavi_zeton(self, zeton, polje):
-        print(zeton, polje)
         for (x, y), koordinata in self.koordinate.items():
             if koordinata == polje:
                 a, b, c, d = self.plosca.coords(self.narisani_zetoni[zeton])
@@ -211,11 +214,13 @@ class GUI():
         else:
             self.igra.zakljucek_poteze(zeton)
             self.odstrani_zeton(zeton)
+
         #poteza se je zakljucila - poklicali smo zakljucek_poteze ali pa se je ta poklical sam (pri odigraj_potezo ni nastala trojka)
         if self.igra.konec_poteze:
             #pogledamo ali je konec igre
             if self.igra.konec_igre:
                 self.koncaj_igro(self.igra.zmagovalec)
+                return
             #ponastavimo konec_poteze
             self.igra.konec_poteze = False
             #igralcu, ki je sedaj na potezi (igralce je ze zamenjal zakljucek_poteze) povemo, naj igra

@@ -12,6 +12,9 @@ class GUI():
         """Ustvari menije in podmenije, izriše igralno ploščo in začne igro s privzetimi nastavitvami"""
 
         self.master = master
+        self.igralec_1 = None
+        self.igralec_2 = None
+        self.igra = None
 
         # Glavni meni
         menu = tk.Menu(master)
@@ -73,7 +76,7 @@ class GUI():
 
         self.plosca.bind("<Button-1>", self.klik_na_plosco)
 
-        self.nova_igra(1,2,3)
+        self.nova_igra(Clovek, Clovek,3)
         # TODO: Začni igro s privzetimi nastavitvami
 
     def izbira_nove_igre(self):
@@ -124,27 +127,34 @@ class GUI():
         ime_2.insert(0, "Igralec 2")
 
     def nova_igra(self, igralec_1, igralec_2, tezavnost=2):
-        # Nariši žetone, pobriši žetone na plošči
+
         d = GUI.VELIKOST_ODSEKA
+
+        self.igralec_1 = igralec_1(self)
+        self.igralec_2 = igralec_2(self)
+        self.igra = game_logic.Igra()
+
+        self.plosca.delete("zeton")
 
         # Pobirisi zetone, ki so ostali na plosci
 
         self.narisani_zetoni = []
         for zeton in range(5):
-             self.narisani_zetoni.append(self.plosca.create_oval(0.625*d - 0.3*d, 6.3 * d - 0.3 * d - d * zeton, 0.625 * d + 0.3 * d, 6.3 * d + 0.3 * d - d * zeton, fill="red", tags="zeton"))
+             self.narisani_zetoni.append(self.plosca.create_oval(0.625*d - 0.3*d, 6.3 * d - 0.3 * d - d * zeton, 0.625 * d + 0.3 * d, 6.3 * d + 0.3 * d - d * zeton, fill="red", tags="zeton", state="normal"))
         for zeton in range(4):
-             self.narisani_zetoni.append(self.plosca.create_oval(1.875 * d - 0.3 * d, 6.3 * d - 0.3 * d - d * zeton, 1.875 * d + 0.3 * d, 6.3 * d + 0.3 * d - d * zeton, fill="red", tags="zeton"))
+             self.narisani_zetoni.append(self.plosca.create_oval(1.875 * d - 0.3 * d, 6.3 * d - 0.3 * d - d * zeton, 1.875 * d + 0.3 * d, 6.3 * d + 0.3 * d - d * zeton, fill="red", tags="zeton", state="normal"))
 
         for zeton in range(5):
-             self.narisani_zetoni.append(self.plosca.create_oval(0.625*d - 0.3*d + 9.5 * d, 6.3 * d - 0.3 * d - d * zeton, 0.625 * d + 0.3 * d + 9.5*d, 6.3 * d + 0.3 * d - d * zeton, fill="green", tags="zeton"))
+             self.narisani_zetoni.append(self.plosca.create_oval(0.625*d - 0.3*d + 9.5 * d, 6.3 * d - 0.3 * d - d * zeton, 0.625 * d + 0.3 * d + 9.5*d, 6.3 * d + 0.3 * d - d * zeton, fill="green", tags="zeton", state="normal"))
         for zeton in range(4):
-             self.narisani_zetoni.append(self.plosca.create_oval(1.875 * d - 0.3 * d + 9.5 * d, 6.3 * d - 0.3 * d - d * zeton, 1.875 * d + 0.3 * d + 9.5*d, 6.3 * d + 0.3 * d - d * zeton, fill="green", tags="zeton"))
+             self.narisani_zetoni.append(self.plosca.create_oval(1.875 * d - 0.3 * d + 9.5 * d, 6.3 * d - 0.3 * d - d * zeton, 1.875 * d + 0.3 * d + 9.5*d, 6.3 * d + 0.3 * d - d * zeton, fill="green", tags="zeton", state="normal"))
 
 
     def koncaj_igro(self, zmagovalec=None):
         pass
 
     def prestavi_zeton(self, zeton, polje):
+        print(zeton, polje)
         for (x, y), koordinata in self.koordinate.items():
             if koordinata == polje:
                 a, b, c, d = self.plosca.coords(self.narisani_zetoni[zeton])
@@ -153,7 +163,7 @@ class GUI():
         return False
 
     def odstrani_zeton(self, zeton):
-        self.plosca.delete(self.narisani_zetoni[zeton])
+        self.plosca.itemconfig(self.narisani_zetoni[zeton], state="hidden")
 
     def klik_na_plosco(self, event):
         polmer_klika = 0.3 * GUI.VELIKOST_ODSEKA
@@ -163,12 +173,12 @@ class GUI():
 
         for id in range(18):
             a, b, c, d = self.plosca.coords(self.narisani_zetoni[id])
-            if razdalja((a+c)/2, (b+d)/2, event.x, event.y) <= polmer_klika ** 2:
+            if self.plosca.itemcget(self.narisani_zetoni[id], "state") == "normal" and razdalja((a+c)/2, (b+d)/2, event.x, event.y) <= polmer_klika ** 2:
                 if self.igra.na_potezi == game_logic.IGRALEC_1:
                     self.igralec_1.klik(id, "ZETON")
                     return
                 else:
-                    self.igralec_1.klik(id, "ZETON")
+                    self.igralec_2.klik(id, "ZETON")
                     return
 
         for krizisce in self.koordinate:
@@ -178,7 +188,7 @@ class GUI():
                     self.igralec_1.klik(self.koordinate[krizisce], "PLOSCA")
                     return
                 else:
-                    self.igralec_1.klik(self.koordinate[krizisce], "PLOSCA")
+                    self.igralec_2.klik(self.koordinate[krizisce], "PLOSCA")
                     return
 
     def povleci_potezo(self, vrsta_poteze, zeton, polje=None):
@@ -227,13 +237,28 @@ class Clovek():
         if (self.prvi_klik is None or (self.drugi_klik, self.tretji_klik) == (None, None)) and objekt is "ZETON":
             self.prvi_klik = koordinata
         #koordinata sedaj predstavlja polje na igralni plosci
-        elif self.drugi_klik is None and objekt is "PLOSCA" and self.gui.igra.veljavna_poteza(self.prvi_klik, koordinata):
+        elif self.prvi_klik is not None and self.drugi_klik is None and objekt is "PLOSCA" and self.gui.igra.veljavna_poteza(self.prvi_klik, koordinata):
             self.drugi_klik = koordinata
             self.gui.povleci_potezo("PREMAKNI", self.prvi_klik, self.drugi_klik)
         #koordinata je indeks nasprotnikovega zetona, ki ga zelimo vzeti
         elif self.tretji_klik is None and self.drugi_klik is not None and objekt is "ZETON" and self.gui.igra.veljavni_zakljucek(koordinata):
             self.tretji_klik = koordinata
             self.gui.povleci_potezo("VZEMI", self.tretji_klik)
+
+class Racunalnik():
+    """Igralec razreda Racunalnik"""
+
+    def __init__(self, gui):
+        """Objekt razreda Racunalnik povezemo z igralno plosco"""
+        self.gui = gui
+
+    def igraj(self):
+        """Poklice se, takoj ko pride igralec Racunalnik na vrsto"""
+        pass
+
+    def klik(self, koordinata, objekt):
+        """Racunalnik ignorira vse klike"""
+        pass
 
 
 

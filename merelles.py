@@ -140,17 +140,20 @@ class GUI():
         for zeton in range(4):
              self.narisani_zetoni.append(self.plosca.create_oval(1.875 * d - 0.3 * d + 9.5 * d, 6.3 * d - 0.3 * d - d * zeton, 1.875 * d + 0.3 * d + 9.5*d, 6.3 * d + 0.3 * d - d * zeton, fill="green", tags="zeton"))
 
-        for id in self.narisani_zetoni:
-            print(self.plosca.coords(id))
 
     def koncaj_igro(self, zmagovalec=None):
         pass
 
     def prestavi_zeton(self, zeton, polje):
-        pass
+        for (x, y), koordinata in self.koordinate.items():
+            if koordinata == polje:
+                a, b, c, d = self.plosca.coords(self.narisani_zetoni[zeton])
+                self.plosca.move(self.narisani_zetoni[zeton], x - a - 0.3 * GUI.VELIKOST_ODSEKA, y - b - 0.3 * GUI.VELIKOST_ODSEKA)
+                return True
+        return False
 
     def odstrani_zeton(self, zeton):
-        pass
+        self.plosca.delete(self.narisani_zetoni[zeton])
 
     def klik_na_plosco(self, event):
         polmer_klika = 0.3 * GUI.VELIKOST_ODSEKA
@@ -160,7 +163,7 @@ class GUI():
 
         for id in range(18):
             a, b, c, d = self.plosca.coords(self.narisani_zetoni[id])
-            if razdalja((a+b)/2, (c+d)/2, event.x, event.y) <= polmer_klika ** 2:
+            if razdalja((a+c)/2, (b+d)/2, event.x, event.y) <= polmer_klika ** 2:
                 if self.igra.na_potezi == game_logic.IGRALEC_1:
                     self.igralec_1.klik(id, "ZETON")
                     return

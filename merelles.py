@@ -1,5 +1,6 @@
 """Glavni del programa Merelles"""
 import tkinter as tk
+import game_logic
 
 
 class GUI():
@@ -65,9 +66,14 @@ class GUI():
             self.plosca.create_oval(x - 0.15 * d, y - 0.15 * d, x + 0.15 * d, y + 0.15 * d, fill="black")
         # ---------------------------------------------------------
 
+        # Zetoni
+        self.narisani_zetoni = []
+
         self.new_game = None
 
         self.plosca.bind("<Button-1>", self.klik_na_plosco)
+
+        self.nova_igra(1,2,3)
         # TODO: Začni igro s privzetimi nastavitvami
 
     def izbira_nove_igre(self):
@@ -117,11 +123,25 @@ class GUI():
         ime_2.grid(row=8, column=3)
         ime_2.insert(0, "Igralec 2")
 
-    def nova_igra(self, igralec_1, igralec_2, tezavnost=3):
+    def nova_igra(self, igralec_1, igralec_2, tezavnost=2):
         # Nariši žetone, pobriši žetone na plošči
-        # self.plosca.create_oval(35, 630, 95, 690, fill="black", tags="zeton-1")
-        # self.plosca.create_oval(135, 630, 195, 690, fill="black")
-        pass
+        d = GUI.VELIKOST_ODSEKA
+
+        # Pobirisi zetone, ki so ostali na plosci
+
+        self.narisani_zetoni = []
+        for zeton in range(5):
+             self.narisani_zetoni.append(self.plosca.create_oval(0.625*d - 0.3*d, 6.3 * d - 0.3 * d - d * zeton, 0.625 * d + 0.3 * d, 6.3 * d + 0.3 * d - d * zeton, fill="red", tags="zeton"))
+        for zeton in range(4):
+             self.narisani_zetoni.append(self.plosca.create_oval(1.875 * d - 0.3 * d, 6.3 * d - 0.3 * d - d * zeton, 1.875 * d + 0.3 * d, 6.3 * d + 0.3 * d - d * zeton, fill="red", tags="zeton"))
+
+        for zeton in range(5):
+             self.narisani_zetoni.append(self.plosca.create_oval(0.625*d - 0.3*d + 9.5 * d, 6.3 * d - 0.3 * d - d * zeton, 0.625 * d + 0.3 * d + 9.5*d, 6.3 * d + 0.3 * d - d * zeton, fill="green", tags="zeton"))
+        for zeton in range(4):
+             self.narisani_zetoni.append(self.plosca.create_oval(1.875 * d - 0.3 * d + 9.5 * d, 6.3 * d - 0.3 * d - d * zeton, 1.875 * d + 0.3 * d + 9.5*d, 6.3 * d + 0.3 * d - d * zeton, fill="green", tags="zeton"))
+
+        for id in self.narisani_zetoni:
+            print(self.plosca.coords(id))
 
     def koncaj_igro(self, zmagovalec=None):
         pass
@@ -133,20 +153,30 @@ class GUI():
         pass
 
     def klik_na_plosco(self, event):
-        polmer_klika = 40
-        x_koordinata = round(event.x, -2)
-        if event.y % 100 <= 50:
-            y_koordinata = round(event.y, -2) + 60
-        else:
-            y_koordinata = round(event.y, -2) - 40
+        polmer_klika = 0.3 * GUI.VELIKOST_ODSEKA
 
-        if abs(x_koordinata - event.x) ** 2 + abs(y_koordinata - event.y) ** 2 <= polmer_klika ** 2:
-            a = (x_koordinata, y_koordinata)
-            if a in self.koordinate:
-                print(self.koordinate[a])
-            pass
+        def razdalja(x, y, a, b):
+            return (x - a) ** 2 + (y - b) ** 2
 
-            # TODO: poklici objekt igralca, ki je na potezi in mu povej, kaj je bilo kliknjeno
+        for id in range(18):
+            a, b, c, d = self.plosca.coords(self.narisani_zetoni[id])
+            if razdalja((a+b)/2, (c+d)/2, event.x, event.y) <= polmer_klika ** 2:
+                if self.igra.na_potezi == game_logic.IGRALEC_1:
+                    self.igralec_1.klik(id, "ZETON")
+                    return
+                else:
+                    self.igralec_1.klik(id, "ZETON")
+                    return
+
+        for krizisce in self.koordinate:
+            a, b = krizisce
+            if razdalja(a, b, event.x, event.y) <= polmer_klika ** 2:
+                if self.igra.na_potezi == game_logic.IGRALEC_1:
+                    self.igralec_1.klik(self.koordinate[krizisce], "PLOSCA")
+                    return
+                else:
+                    self.igralec_1.klik(self.koordinate[krizisce], "PLOSCA")
+                    return
 
     def povleci_potezo(self, vrsta_poteze, zeton, polje=None):
         """Sprejme vrsto_poteze (PREMAKNI ali JEMLJI), zeton in po moznosti se polje (za PREMAKNI) ter odigra potezo."""
@@ -165,7 +195,7 @@ class GUI():
             #ponastavimo konec_poteze
             self.igra.konec_poteze = False
             #igralcu, ki je sedaj na potezi (igralce je ze zamenjal zakljucek_poteze) povemo, naj igra
-            if self.igra.na_potezi is IGRALEC_1:
+            if self.igra.na_potezi is game_logic.IGRALEC_1:
                 self.igralec_1.igraj()
             else:
                 self.igralec_2.igraj()

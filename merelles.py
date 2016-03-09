@@ -28,6 +28,10 @@ class GUI():
         menu_pomoc.add_command(label="Kako igrati")  # TODO: Implementiraj okno z navodili za igro
         menu_pomoc.add_command(label="O igri")  # TODO: Implementiraj okno z informacijami o igri
 
+        # Napis igre in polje za informacije
+        self.napis = tk.StringVar(master, value="Dobrodošli v igro Merelles")
+        tk.Label(master, textvariable=self.napis).grid(row=0, column=1)
+
         # Ustvari platno plosca in ga postavi v okno
         d = GUI.VELIKOST_ODSEKA
         self.plosca = tk.Canvas(master, width=12 * d, height=7.5 * d)
@@ -61,14 +65,57 @@ class GUI():
             self.plosca.create_oval(x - 0.15 * d, y - 0.15 * d, x + 0.15 * d, y + 0.15 * d, fill="black")
         # ---------------------------------------------------------
 
-
+        self.new_game = None
 
         self.plosca.bind("<Button-1>", self.klik_na_plosco)
         # TODO: Začni igro s privzetimi nastavitvami
 
     def izbira_nove_igre(self):
-        new_game = tk.Toplevel()
-        new_game.title("Nova igra")
+        # Ustvari novo okno za izbiro nastavitev nove igre
+        if self.new_game is not None:
+            self.new_game.focus_set()
+            return
+        self.new_game = tk.Toplevel()
+        new_game = self.new_game
+        new_game.title("Merelles - Nova igra")
+        new_game.columnconfigure(3, weight=5)
+
+        tk.Label(new_game, text="Nastavitve nove igre", font=("Helvetica", 20)).grid(row=0, column=0, columnspan=4)
+        tk.Label(new_game, text="Izberite težavnost:").grid(row=1, column=0)
+
+        tezavnosti = [("Težko", 3), ("Srednje", 2), ("Lahko", 1)]
+        izbrana_tezavnost = tk.IntVar()
+        izbrana_tezavnost.set(2)
+        for vrstica, (besedilo, vrednost) in enumerate(tezavnosti):
+            tk.Radiobutton(new_game, text=besedilo, variable=izbrana_tezavnost, value=vrednost, width=10, anchor="w")\
+                .grid(row=vrstica + 2, column=1)
+
+        tk.Label(new_game, text="IGRALEC 1", font=("Helvetica", 13)).grid(row=5, column=0, columnspan=2)
+        tk.Label(new_game, text="IGRALEC 2", font=("Helvetica", 13)).grid(row=5, column=2, columnspan=2)
+
+        tk.Label(new_game, text="Vrsta igralca:").grid(row=6, column=0, rowspan=2)
+        tk.Label(new_game, text="Vrsta igralca:").grid(row=6, column=2, rowspan=2)
+
+        igralec_1_clovek = tk.BooleanVar()
+        igralec_1_clovek.set(True)
+        igralec_2_clovek = tk.BooleanVar()
+        igralec_2_clovek.set(True)
+        igralci = [("Človek", True, igralec_1_clovek, 6, 1), ("Računalnik", False, igralec_1_clovek, 7, 1),
+                   ("Človek", True, igralec_2_clovek, 6, 3), ("Računalnik", False, igralec_2_clovek, 7, 3)]
+
+        for besedilo, vrednost, spremenljivka, vrstica, stolpec in igralci:
+            tk.Radiobutton(new_game, text=besedilo, variable=spremenljivka, value=vrednost, width=10, anchor="w")\
+                .grid(row=vrstica, column=stolpec)
+
+        tk.Label(new_game, text="Ime igralca:").grid(row=8, column=0)
+        tk.Label(new_game, text="Ime igralca:").grid(row=8, column=2)
+
+        ime_1 = tk.Entry(new_game)
+        ime_1.grid(row=8, column=1)
+        ime_1.insert(0, "Igralec 1")
+        ime_2 = tk.Entry(new_game)
+        ime_2.grid(row=8, column=3)
+        ime_2.insert(0, "Igralec 2")
 
     def nova_igra(self, igralec_1, igralec_2, tezavnost=3):
         # Nariši žetone, pobriši žetone na plošči

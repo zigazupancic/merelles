@@ -129,7 +129,7 @@ class Igra():
         """Vrne seznam parov (i, n), kjer je i indeks zetona, ki ga lahko prestavimo, in n polje na plosci, kamor ga
         lahko prestavimo, da bo poteza veljavna.
         Dokler zetone samo postavljamo na plosco, lahko postavimo samo tistega z najnizjim indeksom"""
-        prazna_polja = [i for i in range(24) if self.igralna_plosca is None]
+        prazna_polja = [i for i in range(24) if self.igralna_plosca[i] is None]
         if self.na_potezi is IGRALEC_1:
             poteze = []
             # obstajajo zetoni, ki se niso bili postavljeni na plosco
@@ -172,6 +172,7 @@ class Igra():
     def stanje_igre(self):
         """Ustrezno spremeni atribute faza_igre, konec_igre in zmagovalec"""
         # igralec na potezi nima vec veljavnih potez ali pa sta mu ostala samo se 2 zetona
+        print(self.veljavne_poteze())
         if self.na_potezi is IGRALEC_1 and (self.zetoni[:9].count(False) >= 7 or len(self.veljavne_poteze()) == 0):
             self.konec_igre = True
             self.zmagovalec = IGRALEC_2

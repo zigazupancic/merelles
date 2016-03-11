@@ -9,6 +9,12 @@ class GUI():
     # Velikost delcka plosce.
     VELIKOST_ODSEKA = 100
 
+    # Barve žetonov
+    BARVA_IGRALEC_1 = "red4"
+    BARVA_IGRALEC_1_PRITISNJEN = "red"
+    BARVA_IGRALEC_2 = "green4"
+    BARVA_IGRALEC_2_PRITISNJEN = "lawn green"
+
     def __init__(self, master):
         """Ustvari menije in podmenije, izriše igralno ploščo in začne igro s privzetimi nastavitvami.
         :param master: glavno okno igre
@@ -188,21 +194,23 @@ class GUI():
 
         self.narisani_zetoni = []
         for zeton in range(5):
-            self.narisani_zetoni.append(self.plosca.create_oval(0.325*d, 6*d - d*zeton, 0.925*d, 6.6*d - d*zeton,
-                                                                fill="red", tags="zeton", state="normal", width=0.03*d))
+            self.narisani_zetoni.append(self.plosca.create_oval(
+                0.325*d, 6*d - d*zeton, 0.925*d, 6.6*d - d*zeton, fill=GUI.BARVA_IGRALEC_1, tags="zeton",
+                state="normal", width=0.03*d))
         for zeton in range(4):
-            self.narisani_zetoni.append(self.plosca.create_oval(1.575*d, 6*d - d*zeton, 2.175*d, 6.6*d - d*zeton,
-                                                                fill="red", tags="zeton", state="normal", width=0.03*d))
+            self.narisani_zetoni.append(self.plosca.create_oval(
+                1.575*d, 6*d - d*zeton, 2.175*d, 6.6*d - d*zeton, fill=GUI.BARVA_IGRALEC_1, tags="zeton",
+                state="normal", width=0.03*d))
 
         for zeton in range(5):
             self.narisani_zetoni.append(self.plosca.create_oval(
                 9.825*d, 6*d - d*zeton, 10.425*d, 6.6*d - d*zeton,
-                fill="green", tags="zeton", state="normal", width=0.03*d))
+                fill=GUI.BARVA_IGRALEC_2, tags="zeton", state="normal", width=0.03*d))
 
         for zeton in range(4):
             self.narisani_zetoni.append(self.plosca.create_oval(
                 11.075*d, 6*d - d*zeton, 2.175*d + 9.5*d, 6.6*d - d*zeton,
-                fill="green", tags="zeton", state="normal", width=0.03*d))
+                fill=GUI.BARVA_IGRALEC_2, tags="zeton", state="normal", width=0.03*d))
 
         self.napis.set("Na potezi je {}.".format(self.ime_1))
 
@@ -230,15 +238,27 @@ class GUI():
         def razdalja(x1, y1, x2, y2):
             return (x1 - x2) ** 2 + (y1 - y2) ** 2
 
+        def ponastavi_barve_zetonov():
+            for krogec in self.narisani_zetoni[:9]:
+                self.plosca.itemconfig(krogec, fill=GUI.BARVA_IGRALEC_1)
+            for krogec in self.narisani_zetoni[9:]:
+                self.plosca.itemconfig(krogec, fill=GUI.BARVA_IGRALEC_2)
+
         for id_zetona in range(18):
             a, b, c, d = self.plosca.coords(self.narisani_zetoni[id_zetona])
             if self.plosca.itemcget(self.narisani_zetoni[id_zetona], "state") == "normal" and \
                razdalja((a+c)/2, (b+d)/2, event.x, event.y) <= polmer_klika ** 2:
                 if self.igra.na_potezi == game_logic.IGRALEC_1:
                     self.igralec_1.klik(id_zetona, "ZETON")
+                    ponastavi_barve_zetonov()
+                    if id_zetona < 9:
+                        self.plosca.itemconfig(self.narisani_zetoni[id_zetona], fill=GUI.BARVA_IGRALEC_1_PRITISNJEN)
                     return
                 else:
                     self.igralec_2.klik(id_zetona, "ZETON")
+                    ponastavi_barve_zetonov()
+                    if id_zetona >= 9:
+                        self.plosca.itemconfig(self.narisani_zetoni[id_zetona], fill=GUI.BARVA_IGRALEC_2_PRITISNJEN)
                     return
 
         for krizisce in self.koordinate:
@@ -254,6 +274,12 @@ class GUI():
     def povleci_potezo(self, vrsta_poteze, zeton, polje=None):
         """Sprejme vrsto_poteze (PREMAKNI ali JEMLJI), zeton in po moznosti se polje (za PREMAKNI) ter odigra potezo.
         Veljavnost poteze je preverila ze metoda klik"""
+
+        for krogec in self.narisani_zetoni[:9]:
+            self.plosca.itemconfig(krogec, fill=GUI.BARVA_IGRALEC_1)
+        for krogec in self.narisani_zetoni[9:]:
+            self.plosca.itemconfig(krogec, fill=GUI.BARVA_IGRALEC_2)
+
         if vrsta_poteze is "PREMAKNI":
             self.igra.odigraj_potezo(zeton, polje)
             self.prestavi_zeton(zeton, polje)

@@ -191,6 +191,7 @@ class GUI():
 
         # Pobirisi zetone, ki so ostali na plosci
         self.plosca.delete("zeton")
+        self.plosca.delete("pojeden")
 
         self.narisani_zetoni = []
         for zeton in range(5):
@@ -219,6 +220,7 @@ class GUI():
             self.napis.set("Zmagovalec je {}. Nova igra?".format(self.ime_1))
         elif zmagovalec is game_logic.IGRALEC_2:
             self.napis.set("Zmagovalec je {}. Nova igra?".format(self.ime_2))
+
         self.plosca.itemconfig("zeton", state="disabled")
 
     def prestavi_zeton(self, zeton, polje):
@@ -230,7 +232,7 @@ class GUI():
                 return
 
     def odstrani_zeton(self, zeton):
-        self.plosca.itemconfig(self.narisani_zetoni[zeton], state="hidden")
+        self.plosca.itemconfig(self.narisani_zetoni[zeton], state="hidden", tags="pojeden")
 
     def klik_na_plosco(self, event):
         polmer_klika = 0.3 * GUI.VELIKOST_ODSEKA

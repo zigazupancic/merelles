@@ -1,23 +1,27 @@
-"""Glavni del programa Merelles"""
-import tkinter as tk
-import game_logic
+"""Glavni del programa Merelles."""
+import tkinter as tk     # Knjižnica za grafični vmesnik.
+import game_logic        # Knjižnica za logiko igre.
 
 
 class GUI():
-    """Razred grafičnega vmesnika, ki izriše glavno okno komunicira med uporabnikom in igro"""
+    """Razred grafičnega vmesnika, ki izriše glavno okno komunicira med uporabnikom in igro."""
 
     # Velikost delcka plosce.
     VELIKOST_ODSEKA = 100
 
     def __init__(self, master):
-        """Ustvari menije in podmenije, izriše igralno ploščo in začne igro s privzetimi nastavitvami"""
+        """Ustvari menije in podmenije, izriše igralno ploščo in začne igro s privzetimi nastavitvami.
+        :param master: glavno okno igre
+        """
 
-        self.master = master
-        self.igralec_1 = None
-        self.igralec_2 = None
-        self.igra = None
-        self.ime_1 = "Rdeči"
-        self.ime_2 = "Zeleni"
+        # Nastavitev atributov
+        self.master = master                     # Glavno okno.
+        self.igralec_1 = None                    # Ob začetku nove igra, bo to objekt razreda Oseba ali Računalnik.
+        self.igralec_2 = None                    # Ob začetku nove igra, bo to objekt razreda Oseba ali Računalnik.
+        self.igra = None                         # Ob začetku nove igra, bo to objekt razreda Igra.
+        self.ime_1 = "Rdeči"                     # Privzeto ime prvega igralca.
+        self.ime_2 = "Zeleni"                    # Privzeto ime drugega igralca.
+        self.new_game = None                     # Okno za nastavitev nove igre, ko ni odprto je None.
 
         # Glavni meni
         menu = tk.Menu(master)
@@ -72,52 +76,64 @@ class GUI():
             self.plosca.create_oval(x - 0.15 * d, y - 0.15 * d, x + 0.15 * d, y + 0.15 * d, fill="black")
         # ---------------------------------------------------------
 
-        # Zetoni
+        # Seznam indeksov žetonov, ki so na plošči, kot jih vrne create_oval.
         self.narisani_zetoni = []
 
+        # Ob kliku na ploščo se pokliče metoda klik_na_plosco.
         self.plosca.bind("<Button-1>", self.klik_na_plosco)
-        self.new_game = None
+
+        # Začne novo igro s privzetimi nastavitvami.
         self.nova_igra(Clovek, Clovek)
-        # TODO: Začni igro s privzetimi nastavitvami
 
     def izbira_nove_igre(self):
-        # Ustvari novo okno za izbiro nastavitev nove igre
+        """Ustvari okno za izbiro nastavitev nove igre (če ne obstaja) ter začne novo igro, z izbranimi nastavitvami."""
+
+        # Preveri, če je okno že ustvarjeno, če je ga da na vrh in se vrne.
         if self.new_game is not None:
             self.new_game.lift()
             return
-        self.new_game = tk.Toplevel()
-        self.new_game.title("Merelles - Nova igra")
-        self.new_game.resizable(width=False, height=False)
 
-        self.new_game.grid_columnconfigure(0, minsize=120)
-        self.new_game.grid_columnconfigure(2, minsize=150)
-        self.new_game.grid_rowconfigure(0, minsize=80)
-        self.new_game.grid_rowconfigure(5, minsize=70)
-        self.new_game.grid_rowconfigure(9, minsize=80)
+        # Ustvari novo okno za izbiro nastavitev nove igre.
+        self.new_game = tk.Toplevel()
+        self.new_game.title("Merelles - Nova igra")                # Naslov okna
+        self.new_game.resizable(width=False, height=False)         # Velikosti okna ni mogoče spreminjati
+
+        self.new_game.grid_columnconfigure(0, minsize=120)         # Nastavitev minimalne širine ničtega stolpca
+        self.new_game.grid_columnconfigure(2, minsize=150)         # Nastavitev minimalne širine drugega stolpca
+        self.new_game.grid_rowconfigure(0, minsize=80)             # Nastavitev minimalne višine ničte vrstice
+        self.new_game.grid_rowconfigure(5, minsize=70)             # Nastavitev minimalne višine pete vrstice
+        self.new_game.grid_rowconfigure(9, minsize=80)             # Nastavitev minimalne višine devete vrstice
 
         tk.Label(self.new_game, text="Nastavitve nove igre", font=("Helvetica", 20)).grid(row=0, column=0, columnspan=4)
-        tk.Label(self.new_game, text="Izberite težavnost:").grid(row=1, column=1, sticky="W")
 
-        tezavnosti = [("Težko", 3), ("Srednje", 2), ("Lahko", 1)]
-        izbrana_tezavnost = tk.IntVar()
-        izbrana_tezavnost.set(2)
+        # Nastavitve težavnosti
+        # ---------------------------------------------------------
+        tk.Label(self.new_game, text="Izberite težavnost:").grid(row=1, column=1, sticky="W")
+        tezavnosti = [("Težko", 3), ("Srednje", 2), ("Lahko", 1)]  # Možne težavnosti
+        izbrana_tezavnost = tk.IntVar()                            # Spremenljivka kamor shranimo izbrano težavnost
+        izbrana_tezavnost.set(2)                                   # Nastavitev privzete vrednosti
+
+        # Ustvari radijske gumbe za izbrio težavnosti:
         for vrstica, (besedilo, vrednost) in enumerate(tezavnosti):
             tk.Radiobutton(self.new_game, text=besedilo, variable=izbrana_tezavnost, value=vrednost, width=10,
                            anchor="w").grid(row=vrstica + 2, column=1)
+        # ---------------------------------------------------------
 
+        # Nastavitve igralcev
+        # ---------------------------------------------------------
         tk.Label(self.new_game, text="IGRALEC 1", font=("Helvetica", 13)).grid(row=5, column=0, sticky="E")
         tk.Label(self.new_game, text="IGRALEC 2", font=("Helvetica", 13)).grid(row=5, column=2, sticky="E")
-
         tk.Label(self.new_game, text="Vrsta igralca:").grid(row=6, column=0, rowspan=2, sticky="E")
         tk.Label(self.new_game, text="Vrsta igralca:").grid(row=6, column=2, rowspan=2, sticky="E")
 
-        igralec_1_clovek = tk.BooleanVar()
-        igralec_1_clovek.set(True)
-        igralec_2_clovek = tk.BooleanVar()
-        igralec_2_clovek.set(True)
+        igralec_1_clovek = tk.BooleanVar()                         # Spremenljivka kamor shranimo vrsto prvega igralca
+        igralec_1_clovek.set(True)                                 # Privzeta vrednost vrste prvega igralca
+        igralec_2_clovek = tk.BooleanVar()                         # Spremenljivka kamor shranimo vrsto drugega igralca
+        igralec_2_clovek.set(True)                                 # Privzeta vrednost vrste drugega igralca
         igralci = [("Človek", True, igralec_1_clovek, 6, 1), ("Računalnik", False, igralec_1_clovek, 7, 1),
                    ("Človek", True, igralec_2_clovek, 6, 3), ("Računalnik", False, igralec_2_clovek, 7, 3)]
 
+        # Ustvari radijske gumbe za izbiro vrste igralcev
         for besedilo, vrednost, spremenljivka, vrstica, stolpec in igralci:
             tk.Radiobutton(self.new_game, text=besedilo, variable=spremenljivka, value=vrednost, width=10, anchor="w")\
                 .grid(row=vrstica, column=stolpec)
@@ -125,14 +141,16 @@ class GUI():
         tk.Label(self.new_game, text="Ime igralca:").grid(row=8, column=0, sticky="E")
         tk.Label(self.new_game, text="Ime igralca:").grid(row=8, column=2, sticky="E")
 
-        ime_1 = tk.Entry(self.new_game, font="Helvetica 12", width=10)
+        ime_1 = tk.Entry(self.new_game, font="Helvetica 12", width=10)  # Vnosno polje za ime prvega igralca
         ime_1.grid(row=8, column=1)
-        ime_1.insert(0, self.ime_1)
-        ime_2 = tk.Entry(self.new_game, font="Helvetica 12", width=10)
+        ime_1.insert(0, self.ime_1)                                     # Privzeto ime prvega igralca
+        ime_2 = tk.Entry(self.new_game, font="Helvetica 12", width=10)  # Vnosno polje za ime drugega igralca
         ime_2.grid(row=8, column=3)
-        ime_2.insert(0, self.ime_2)
+        ime_2.insert(0, self.ime_2)                                     # Privzeto ime drugega igralca
+        # ---------------------------------------------------------
 
         def ustvari_igro():
+            """Pomožna funkcija, ki ustvari novo igro, nastavi ime igralcev ter zapre okno za izbiro nastavitev."""
             self.ime_1 = ime_1.get()
             self.ime_2 = ime_2.get()
             if igralec_1_clovek.get():
@@ -148,11 +166,15 @@ class GUI():
             self.new_game = None
 
         def preklici():
+            """Pomožna funkcija, ki zapre okno in nastavi atribut self.new_game na None."""
             self.new_game.destroy()
             self.new_game = None
 
-        tk.Button(self.new_game, text="Prekliči", width=20, height=2, command=lambda: preklici()).grid(row=9, column=0, columnspan=3, sticky="E")
-        tk.Button(self.new_game, text="Začni igro", width=20, height=2, command=lambda: ustvari_igro()).grid(row=9, column=3, columnspan=3, sticky="E")
+        # Gumba za začetek nove igre in preklic
+        tk.Button(self.new_game, text="Prekliči", width=20, height=2,
+                  command=lambda: preklici()).grid(row=9, column=0, columnspan=3, sticky="E")
+        tk.Button(self.new_game, text="Začni igro", width=20, height=2,
+                  command=lambda: ustvari_igro()).grid(row=9, column=3, columnspan=3, sticky="E")
 
     def nova_igra(self, igralec_1, igralec_2, tezavnost=2):
         d = GUI.VELIKOST_ODSEKA
@@ -161,28 +183,27 @@ class GUI():
         self.igralec_2 = igralec_2(self, tezavnost)
         self.igra = game_logic.Igra()
 
-        self.plosca.delete("zeton")
-
         # Pobirisi zetone, ki so ostali na plosci
+        self.plosca.delete("zeton")
 
         self.narisani_zetoni = []
         for zeton in range(5):
-            self.narisani_zetoni.append(self.plosca.create_oval(
-                0.625*d - 0.3*d, 6.3 * d - 0.3 * d - d * zeton, 0.625 * d + 0.3 * d, 6.3 * d + 0.3 * d - d * zeton,
-                fill="red", tags="zeton", state="normal"))
+            self.narisani_zetoni.append(self.plosca.create_oval(0.325*d, 6*d - d*zeton, 0.925*d, 6.6*d - d*zeton,
+                                                                fill="red", tags="zeton", state="normal", width=0.03*d))
         for zeton in range(4):
-            self.narisani_zetoni.append(self.plosca.create_oval(
-                1.875 * d - 0.3 * d, 6.3 * d - 0.3 * d - d * zeton, 1.875 * d + 0.3 * d, 6.3 * d + 0.3 * d - d * zeton,
-                fill="red", tags="zeton", state="normal"))
+            self.narisani_zetoni.append(self.plosca.create_oval(1.575*d, 6*d - d*zeton, 2.175*d, 6.6*d - d*zeton,
+                                                                fill="red", tags="zeton", state="normal", width=0.03*d))
 
         for zeton in range(5):
             self.narisani_zetoni.append(self.plosca.create_oval(
-                0.625*d - 0.3*d + 9.5 * d, 6.3 * d - 0.3 * d - d * zeton, 0.625 * d + 0.3 * d + 9.5*d,
-                6.3 * d + 0.3 * d - d * zeton, fill="green", tags="zeton", state="normal"))
+                9.825*d, 6*d - d*zeton, 10.425*d, 6.6*d - d*zeton,
+                fill="green", tags="zeton", state="normal", width=0.03*d))
+
         for zeton in range(4):
             self.narisani_zetoni.append(self.plosca.create_oval(
-                1.875 * d - 0.3 * d + 9.5 * d, 6.3 * d - 0.3 * d - d * zeton, 1.875 * d + 0.3 * d + 9.5*d,
-                6.3 * d + 0.3 * d - d * zeton, fill="green", tags="zeton", state="normal"))
+                11.075*d, 6*d - d*zeton, 2.175*d + 9.5*d, 6.6*d - d*zeton,
+                fill="green", tags="zeton", state="normal", width=0.03*d))
+
         self.napis.set("Na potezi je {}.".format(self.ime_1))
 
     def koncaj_igro(self, zmagovalec=None):

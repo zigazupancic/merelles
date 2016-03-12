@@ -1,6 +1,8 @@
 """Glavni del programa Merelles."""
 import tkinter as tk     # Knjižnica za grafični vmesnik.
 import game_logic        # Knjižnica za logiko igre.
+import threading
+import random
 
 
 class GUI():
@@ -214,6 +216,7 @@ class GUI():
                 fill=GUI.BARVA_IGRALEC_2, tags="zeton", state="normal", width=0.03*d))
 
         self.napis.set("Na potezi je {}.".format(self.ime_1))
+        self.igralec_1.igraj()
 
     def koncaj_igro(self, zmagovalec=None):
         if zmagovalec is game_logic.IGRALEC_1:
@@ -355,15 +358,174 @@ class Racunalnik():
     def __init__(self, gui, tezavnost):
         """Objekt razreda Racunalnik povezemo z igralno plosco"""
         self.gui = gui
-        self.tezavnost = tezavnost
+        self.algoritem = Minimax(5)
+        self.mislec = None
 
     def igraj(self):
         """Poklice se, takoj ko pride igralec Racunalnik na vrsto"""
-        pass
+        # Naredimo vlakno, ki mu podamo *kopijo* igre (da ne bo zmedel GUIja):
+        self.mislec = threading.Thread(
+            target=lambda: self.algoritem.izracunaj_potezo(self.gui.igra.kopija_igre()))
+
+        # Poženemo vlakno:
+        self.mislec.start()
+
+        # Gremo preverjat, ali je bila najdena poteza:
+        self.gui.plosca.after(100, self.preveri_potezo)
+
+    def preveri_potezo(self):
+        """Vsakih 100ms preveri, ali je algoritem že izračunal potezo."""
+        if self.algoritem.poteza is not None:
+            # Algoritem je našel potezo, povleci jo, če ni bilo prekinitve
+            (a, b, c) = self.algoritem.poteza
+            if c is None:
+                self.gui.povleci_potezo("PREMAKNI", a, b)
+            else:
+                self.gui.povleci_potezo("PREMAKNI", a, b)
+                self.gui.povleci_potezo("VZEMI", c)
+            # Vzporedno vlakno ni več aktivno, zato ga "pozabimo"
+            self.mislec = None
+        else:
+            # Algoritem še ni našel poteze, preveri še enkrat čez 100ms
+            self.gui.plosca.after(100, self.preveri_potezo)
+
+    def prekini(self):
+        # To metodo kliče GUI, če je treba prekiniti razmišljanje.
+        if self.mislec:
+            self.algoritem.prekini()
+            # Počakamo, da se vlakno ustavi
+            self.mislec.join()
+            self.mislec = None
 
     def klik(self, koordinata, objekt):
         """Racunalnik ignorira vse klike"""
         pass
+
+class Minimax:
+    # Algoritem minimax predstavimo z objektom, ki hrani stanje igre in
+    # algoritma, nima pa dostopa do GUI (ker ga ne sme uporabljati, saj deluje
+    # v drugem vlaknu kot tkinter).
+
+    def __init__(self, globina):
+        self.globina = globina  # do katere globine iščemo?
+        self.prekinitev = False # ali moramo končati?
+        self.igra = None # objekt, ki opisuje igro (ga dobimo kasneje)
+        self.jaz = None  # katerega igralca igramo (podatek dobimo kasneje)
+        self.poteza = None # sem napišemo potezo, ko jo najdemo
+
+    def prekini(self):
+        """Metoda, ki jo pokliče GUI, če je treba nehati razmišljati, ker
+           je uporabnik zaprl okno ali izbral novo igro."""
+        self.prekinitev = True
+
+    def izracunaj_potezo(self, igra):
+        """Izračunaj potezo za trenutno stanje dane igre."""
+        # To metodo pokličemo iz vzporednega vlakna
+        self.igra = igra
+        self.prekinitev = False # Glavno vlakno bo to nastavilo na True, če moramo nehati
+        self.jaz = self.igra.na_potezi
+        self.poteza = None # Sem napišemo potezo, ko jo najdemo
+        # Poženemo minimax
+        (poteza, vrednost) = self.minimax(self.globina, -Minimax.NESKONCNO, Minimax.NESKONCNO, True)
+        self.jaz = None
+        self.igra = None
+        if not self.prekinitev:
+            # Potezo izvedemo v primeru, da nismo bili prekinjeni
+            self.poteza = poteza
+
+    # Vrednosti igre
+    ZMAGA = 100000 # Mora biti vsaj 10^5
+    NESKONCNO = ZMAGA + 1 # Več kot zmaga
+
+    def vrednost_pozicije(self):
+        """Ocena vrednosti pozicije"""
+        ocena = self.igra.zetoni[:9].count("izlocen") - self.igra.zetoni[9:].count("izlocen")
+        if self.jaz is game_logic.IGRALEC_1:
+            return ocena * (-1)
+        else:
+            return ocena
+
+    def minimax(self, globina, alfa, beta, maksimiziramo):
+        """Glavna metoda minimax."""
+        if self.prekinitev:
+            return (None, None, None, 0)
+        if self.igra.konec_igre:
+            # Igre je konec, vrnemo njeno vrednost
+            if self.igra.zmagovalec == self.jaz:
+                return ((None, None, None), Minimax.ZMAGA)
+            else:
+                return ((None, None, None), -Minimax.ZMAGA)
+        else:
+            # Igre ni konec
+            if globina == 0:
+                return ((None, None, None), self.vrednost_pozicije())
+            else:
+                # Naredimo eno stopnjo minimax
+                if maksimiziramo:
+                    # Maksimiziramo
+                    najboljsa_poteza = (None, None, None)
+                    vrednost_najboljse = -Minimax.NESKONCNO
+                    for zeton, polje in self.igra.veljavne_poteze():
+                        self.igra.odigraj_potezo(zeton, polje)
+                        if self.igra.konec_poteze:
+                            self.igra.konec_poteze = False
+                            vrednost = self.minimax(globina-1, alfa, beta, not maksimiziramo)[1]
+                            self.igra.razveljavi()
+                            if vrednost > vrednost_najboljse:
+                                vrednost_najboljse = vrednost
+                                najboljsa_poteza = (zeton, polje, None)
+                            if vrednost > alfa:
+                                alfa = vrednost
+                            if beta <= alfa:
+                                break
+                        else:
+                            for zeton_1 in self.igra.veljavni_zakljucki():
+                                self.igra.zakljucek_poteze(zeton_1)
+                                self.igra.konec_poteze = False
+                                vrednost = self.minimax(globina-1, alfa, beta, not maksimiziramo)[1]
+                                self.igra.razveljavi()
+                                if vrednost > vrednost_najboljse:
+                                    vrednost_najboljse = vrednost
+                                    najboljsa_poteza = (zeton, polje, zeton_1)
+                                if vrednost > alfa:
+                                    alfa = vrednost
+                                if beta <= alfa:
+                                    break
+                            self.igra.razveljavi()
+                else:
+                    # Minimiziramo
+                    najboljsa_poteza = (None, None, None)
+                    vrednost_najboljse = Minimax.NESKONCNO
+                    for zeton, polje in self.igra.veljavne_poteze():
+                        self.igra.odigraj_potezo(zeton, polje)
+                        if self.igra.konec_poteze:
+                            self.igra.konec_poteze = False
+                            vrednost = self.minimax(globina-1, alfa, beta, not maksimiziramo)[1]
+                            self.igra.razveljavi()
+                            if vrednost < vrednost_najboljse:
+                                vrednost_najboljse = vrednost
+                                najboljsa_poteza = (zeton, polje, None)
+                            if vrednost < beta:
+                                beta = vrednost
+                            if beta <= alfa:
+                                break
+                        else:
+                            for zeton_1 in self.igra.veljavni_zakljucki():
+                                self.igra.zakljucek_poteze(zeton_1)
+                                self.igra.konec_poteze = False
+                                vrednost = self.minimax(globina-1, alfa, beta, not maksimiziramo)[1]
+                                self.igra.razveljavi()
+                                if vrednost < vrednost_najboljse:
+                                    vrednost_najboljse = vrednost
+                                    najboljsa_poteza = (zeton, polje, zeton_1)
+                                if vrednost < beta:
+                                    beta = vrednost
+                                if beta <= alfa:
+                                    break
+                            self.igra.razveljavi()
+
+                assert (najboljsa_poteza is not (None, None, None)), "minimax: izračunana poteza je None"
+                return (najboljsa_poteza, vrednost_najboljse)
 
                 
 if __name__ == "__main__":

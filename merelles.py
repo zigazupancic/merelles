@@ -28,6 +28,8 @@ class GUI():
         self.ime_1 = "Rdeči"                     # Privzeto ime prvega igralca.
         self.ime_2 = "Zeleni"                    # Privzeto ime drugega igralca.
         self.new_game = None                     # Okno za nastavitev nove igre, ko ni odprto je None.
+        self.about = None                        # Okno za podatke o igri, ko ni odprto je None.
+        self.help = None                         # Okno za pomoč pri igranju igre, ko ni odprto je None.
 
         # Glavni meni
         menu = tk.Menu(master)
@@ -43,7 +45,7 @@ class GUI():
         menu_pomoc = tk.Menu(menu)
         menu.add_cascade(label="Pomoč", menu=menu_pomoc)
         menu_pomoc.add_command(label="Kako igrati")  # TODO: Implementiraj okno z navodili za igro
-        menu_pomoc.add_command(label="O igri")  # TODO: Implementiraj okno z informacijami o igri
+        menu_pomoc.add_command(label="O igri", command=self.o_igri)
 
         # Napis igre in polje za informacije
         self.napis = tk.StringVar(self.master, value="Na potezi je {}.".format(self.ime_1))
@@ -91,8 +93,59 @@ class GUI():
         # Začne novo igro s privzetimi nastavitvami.
         self.nova_igra(Clovek, Clovek)
 
+    def o_igri(self):
+
+        def preklici():
+            """Pomožna funkcija, ki zapre okno in nastavi atribut self.about na None."""
+            self.about.destroy()
+            self.about = None
+
+        # Preveri, če je okno že ustvarjeno, če je ga da na vrh in se vrne.
+        if self.about is not None:
+            self.about.lift()
+            return
+
+        # Ustvari okno z informacijami o igri.
+        self.about = tk.Toplevel()
+        self.about.title("O igri")
+        self.about.resizable(width=False, height=False)
+        self.about.protocol("WM_DELETE_WINDOW", preklici)
+
+        self.about.grid_columnconfigure(0, minsize=400)
+        self.about.grid_rowconfigure(0, minsize=80)             # Nastavitev minimalne višine ničte vrstice
+        self.about.grid_rowconfigure(2, minsize=80)             # Nastavitev minimalne višine druge vrstice
+
+        tk.Label(self.about, text="Merelles (Mlin) je strateška igra za dva igralca, \n ki izvira iz Rimskega imperija."
+                                  "\nObstaja več različic igre (z različnim \n"
+                                  "številom žetonov in povezav na plošči).", justify="left").grid(row=1, column=0)
+        tk.Label(self.about, text="O igri Merelles (Mlin)", font=("Helvetica", 20)).grid(row=0, column=0)
+        tk.Label(self.about, text="Avtorja aplikacije: Žiga Zupančič in Juš Kosmač \n Licenca: MIT \n "
+                                  "Aplikacija ustvarjena za Programiranje 2 (FMF) - 2016.",
+                 justify="left").grid(row=2, column=0)
+
     def izbira_nove_igre(self):
         """Ustvari okno za izbiro nastavitev nove igre (če ne obstaja) ter začne novo igro, z izbranimi nastavitvami."""
+
+        def ustvari_igro():
+            """Pomožna funkcija, ki ustvari novo igro, nastavi ime igralcev ter zapre okno za izbiro nastavitev."""
+            self.ime_1 = ime_1.get()
+            self.ime_2 = ime_2.get()
+            if igralec_1_clovek.get():
+                igralec_1 = Clovek
+            else:
+                igralec_1 = Racunalnik
+            if igralec_2_clovek.get():
+                igralec_2 = Clovek
+            else:
+                igralec_2 = Racunalnik
+            self.nova_igra(igralec_1, igralec_2, izbrana_tezavnost.get())
+            self.new_game.destroy()
+            self.new_game = None
+
+        def preklici():
+            """Pomožna funkcija, ki zapre okno in nastavi atribut self.new_game na None."""
+            self.new_game.destroy()
+            self.new_game = None
 
         # Preveri, če je okno že ustvarjeno, če je ga da na vrh in se vrne.
         if self.new_game is not None:
@@ -101,6 +154,7 @@ class GUI():
 
         # Ustvari novo okno za izbiro nastavitev nove igre.
         self.new_game = tk.Toplevel()
+        self.new_game.protocol("WM_DELETE_WINDOW", preklici)
         self.new_game.title("Merelles - Nova igra")                # Naslov okna
         self.new_game.resizable(width=False, height=False)         # Velikosti okna ni mogoče spreminjati
 
@@ -154,27 +208,6 @@ class GUI():
         ime_2.grid(row=8, column=3)
         ime_2.insert(0, self.ime_2)                                     # Privzeto ime drugega igralca
         # ---------------------------------------------------------
-
-        def ustvari_igro():
-            """Pomožna funkcija, ki ustvari novo igro, nastavi ime igralcev ter zapre okno za izbiro nastavitev."""
-            self.ime_1 = ime_1.get()
-            self.ime_2 = ime_2.get()
-            if igralec_1_clovek.get():
-                igralec_1 = Clovek
-            else:
-                igralec_1 = Racunalnik
-            if igralec_2_clovek.get():
-                igralec_2 = Clovek
-            else:
-                igralec_2 = Racunalnik
-            self.nova_igra(igralec_1, igralec_2, izbrana_tezavnost.get())
-            self.new_game.destroy()
-            self.new_game = None
-
-        def preklici():
-            """Pomožna funkcija, ki zapre okno in nastavi atribut self.new_game na None."""
-            self.new_game.destroy()
-            self.new_game = None
 
         # Gumba za začetek nove igre in preklic
         tk.Button(self.new_game, text="Prekliči", width=20, height=2,

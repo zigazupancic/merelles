@@ -391,7 +391,7 @@ class Racunalnik():
     def __init__(self, gui, tezavnost):
         """Objekt razreda Racunalnik povezemo z igralno plosco"""
         self.gui = gui
-        self.algoritem = Minimax(6)
+        self.algoritem = Minimax(5)
         self.mislec = None
 
     def igraj(self):
@@ -476,25 +476,25 @@ class Minimax:
         if self.jaz is game_logic.IGRALEC_1:
             if self.igra.faza_igre == 1:
                 #koeficienti = (0,0,1,0,0)
-                koeficienti = (26, 1, 6, 12, 7)
+                koeficienti = (26, 1, 6, 12, 7, 1)
             elif self.igra.zetoni[:9].count('izlocen') >= 6:
-                koeficienti = (0, 0, 0, 10, 1)
+                koeficienti = (0, 0, 0, 10, 1, 0)
             else:
-                koeficienti = (43, 10, 8, 0, 0)
+                koeficienti = (43, 10, 8, 0, 0, 0)
             ocena = 0
-            for i in range(5):
+            for i in range(6):
                 ocena += koeficienti[i] * vrednosti[i]
             return ocena
         else:
             if self.igra.faza_igre == 1:
                 #koeficienti = (0,0,1,0,0)
-                koeficienti = (26, 1, 6, 12, 7)
+                koeficienti = (26, 1, 6, 12, 7, 1)
             elif self.igra.zetoni[9:].count('izlocen') >= 6:
-                koeficienti = (0, 0, 0, 10, 1)
+                koeficienti = (0, 0, 0, 10, 1, 0)
             else:
-                koeficienti = (43, 10, 8, 0, 0)
+                koeficienti = (43, 10, 8, 0, 0, 0)
             ocena = 0
-            for i in range(5):
+            for i in range(6):
                 ocena += koeficienti[i] * vrednosti[i]
             return -ocena
 

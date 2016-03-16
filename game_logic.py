@@ -225,13 +225,20 @@ class Igra():
         # r3 je razlika med številom žetonov igralca 1 in igralca 2
         # r4 je razlika med številom "2 pieces configuration" igralca 1 in igralca 2
         # r5 je razlika med številom "3 pieces configuration" igralca 2 in igralca 2
-        r1, r2, r3, r4, r5 = 0, 0, 0, 0, 0
+        # r6 je razlika med številom zavzetih križišč igralca 1 in igralca 2
+        r1, r2, r3, r4, r5, r6 = 0, 0, 0, 0, 0, 0
         zetoni1 = {x for x in self.zetoni[:9] if x not in ['izlocen', 'zacetek']}
         zetoni2 = {x for x in self.zetoni[9:] if x not in ['izlocen', 'zacetek']}
 
         r3 = self.zetoni[9:].count('izlocen') - self.zetoni[:9].count('izlocen')
         dvojke1 = []
         dvojke2 = []
+
+        for i in [4, 10, 13, 19]:
+            if i in zetoni1:
+                r6 += 1
+            elif i in zetoni2:
+                r6 -= 1
 
         for a, b, c in self.trojke:
             prvi = 0
@@ -281,12 +288,12 @@ class Igra():
 
         for zeton in zetoni1:
             if zeton not in ['izlocen', 'zacetek']:
-                if set(self.sosedi[zeton]) <= zetoni2:
+                if set(self.sosedi[zeton]) <= (zetoni2 | zetoni1):
                     r2 -= 1
 
         for zeton in zetoni2:
             if zeton not in ['izlocen', 'zacetek']:
-                if set(self.sosedi[zeton]) <= zetoni1:
+                if set(self.sosedi[zeton]) <= (zetoni2 | zetoni1):
                     r2 += 1
 
-        return (r1, r2, r3, r4, r5)
+        return (r1, r2, r3, r4, r5, r6)

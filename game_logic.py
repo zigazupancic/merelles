@@ -15,6 +15,8 @@ class Igra():
         self.trojke = [{0, 1, 2}, {3, 4, 5}, {6, 7, 8}, {9, 10, 11}, {12, 13, 14}, {15, 16, 17}, {18, 19, 20},
                        {21, 22, 23}, {0, 9, 21}, {3, 10, 18}, {6, 11, 15}, {1, 4, 7}, {16, 19, 22}, {8, 12, 17},
                        {5, 13, 20}, {2, 14, 23}]
+
+
         # v seznamu self.zetoni ustreza indeks i zetonu i: "zacetek" - ni se vstopil v igro,
         # "izlocen" - je ze izlocen iz igre, n - nahaja se na igralni plosci na mestu n
         # indeksi 0-8 so za zetone igralca 1, ostali za zetone igralca 2
@@ -203,3 +205,77 @@ class Igra():
         if self.zetoni.count("zacetek") == 0:
             self.faza_igre = 2
 
+    def ocena_postavitve(self):
+        # r1 je razlika med številom trojk igralca 1 in igralca 2
+        # r2 je razlika med številom blokiranih žetonov igralca 1 in igralca 2
+        # r3 je razlika med številom žetonov igralca 1 in igralca 2
+        # r4 je razlika med številom "2 pieces configuration" igralca 1 in igralca 2
+        # r5 je razlika med številom "3 pieces configuration" igralca 2 in igralca 2
+        r1, r2, r3, r4, r5 = 0, 0, 0, 0, 0
+        zetoni1 = {x for x in self.zetoni[:9] if x not in ['izlocen', 'zacetek']}
+        zetoni2 = {x for x in self.zetoni[9:] if x not in ['izlocen', 'zacetek']}
+
+        r3 = len(zetoni1) - len(zetoni2)
+        dvojke1 = []
+        dvojke2 = []
+
+        for a, b, c in self.trojke:
+            prvi = 0
+            mesta1 = set()
+            drugi = 0
+            mesta2 = set()
+            if a in zetoni1:
+                prvi += 1
+                mesta1.add(a)
+            if a in zetoni2:
+                drugi += 1
+                mesta2.add(a)
+            if b in zetoni1:
+                prvi += 1
+                mesta1.add(b)
+            if b in zetoni2:
+                drugi += 1
+                mesta2.add(b)
+            if c in zetoni1:
+                prvi += 1
+                mesta1.add(c)
+            if c in zetoni2:
+                drugi += 1
+                mesta2.add(c)
+            if prvi == 3:
+                r1 += 1
+            elif drugi == 3:
+                r1 -= 1
+            elif prvi == 2 and drugi == 0:
+                r4 += 1
+                dvojke1.append(mesta1)
+            elif prvi == 0 and drugi == 2:
+                dvojke2.append(mesta2)
+                r4 -= 1
+
+        for sez1 in dvojke1:
+            for sez2 in dvojke1:
+                if len(sez1 & sez2) == 1:
+                    r5 += 1
+
+        for sez1 in dvojke2:
+            for sez2 in dvojke2:
+                if len(sez1 & sez2) == 1:
+                    r5 -= 1
+
+        r5 //= 2
+
+        for zeton in zetoni1:
+            if zeton not in ['izlocen', 'zacetek']:
+                if set(self.sosedi[zeton]) <= zetoni2:
+                    r3 -= 1
+
+        for zeton in zetoni2:
+            if zeton not in ['izlocen', 'zacetek']:
+                if set(self.sosedi[zeton]) <= zetoni1:
+                    r3 += 1
+
+        return (r1, r2, r3, r4, r5)           
+        
+
+        

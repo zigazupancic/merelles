@@ -472,10 +472,34 @@ class Minimax:
 
     def vrednost_pozicije(self):
         """Ocena vrednosti pozicije"""
-        ocena = self.igra.zetoni[:9].count("izlocen") - self.igra.zetoni[9:].count("izlocen")
+        vrednosti = self.igra.ocena_postavitve()
         if self.jaz is game_logic.IGRALEC_1:
+            if self.igra.faza_igre == 1:
+                koeficienti = (26, 1, 6, 12, 7)
+                ocena = 0
+                for i in range(5):
+                    ocena += koeficienti[i] * vrednosti[i]
+            elif self.igra.zetoni[:9].count('izlocen') >= 6:
+                koeficienti = (0, 0, 0, 10, 1)
+            else:
+                koeficienti = (43, 10, 8, 0, 0)
+            ocena = 0
+            for i in range(5):
+                ocena += koeficienti[i] * vrednosti[i]
             return ocena * (-1)
         else:
+            if self.igra.faza_igre == 1:
+                koeficienti = (26, 1, 6, 12, 7)
+                ocena = 0
+                for i in range(5):
+                    ocena += koeficienti[i] * vrednosti[i]
+            elif self.igra.zetoni[9:].count('izlocen') >= 6:
+                koeficienti = (0, 0, 0, 10, 1)
+            else:
+                koeficienti = (43, 10, 8, 0, 0)
+            ocena = 0
+            for i in range(5):
+                ocena += koeficienti[i] * vrednosti[i]
             return ocena
 
     def minimax(self, globina, alfa, beta, maksimiziramo):
@@ -525,6 +549,8 @@ class Minimax:
                                 if beta <= alfa:
                                     break
                             self.igra.razveljavi()
+                            if beta <= alfa:
+                                break
                 else:
                     # Minimiziramo
                     najboljsa_poteza = (None, None, None)
@@ -556,6 +582,8 @@ class Minimax:
                                 if beta <= alfa:
                                     break
                             self.igra.razveljavi()
+                            if beta <= alfa:
+                                break
 
                 assert (najboljsa_poteza is not (None, None, None)), "minimax: izračunana poteza je None"
                 return (najboljsa_poteza, vrednost_najboljse)

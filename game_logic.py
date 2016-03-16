@@ -99,7 +99,7 @@ class Igra():
                 return True
             else:
                 return not self.nova_trojka(zeton)
-    
+
     def odigraj_potezo(self, zeton, polje):
         """Sprejme indeks zetona in polje, kamor ga zelimo prestaviti.
         Privzamemo, da je poteza veljavna - veljavnost bo preveril GUI, preden poklice to metodo"""
@@ -147,7 +147,7 @@ class Igra():
         self.konec_poteze = True
         #poklicemo stanje igre
         self.stanje_igre()
-    
+
     def veljavne_poteze(self):
         """Vrne seznam parov (i, n), kjer je i indeks zetona, ki ga lahko prestavimo, in n polje na plosci, kamor ga
         lahko prestavimo, da bo poteza veljavna.
@@ -162,6 +162,13 @@ class Igra():
                     poteze.append((najnizji_index, polje))
                 return poteze
             # vsi zetoni se ze nahajajo na plosci (nobeden nima statusa None)
+            elif self.zetoni[:9].count('izlocen') >= 6:
+                for i in range(9):
+                    # zeton (oznacuje pozicijo na plosci) je se v igri
+                    if self.zetoni[i] != "izlocen":
+                        for polje in prazna_polja:
+                            poteze.append((i, polje))
+                return poteze
             else:
                 for i in range(9):
                     # zeton (oznacuje pozicijo na plosci) je se v igri
@@ -179,6 +186,13 @@ class Igra():
                     poteze.append((najnizji_index, polje))
                 return poteze
             # vsi zetoni se ze nahajajo na plosci (nobeden nima statusa None)
+            elif self.zetoni[9:].count('izlocen') >= 6:
+                for i in range(9, 18):
+                    # zeton (oznacuje pozicijo na plosci) je se v igri
+                    if self.zetoni[i] != "izlocen":
+                        for polje in prazna_polja:
+                            poteze.append((i, polje))
+                return poteze
             else:
                 for i in range(9, 18):
                     #zeton (oznacuje pozicijo na plosci) je se v igri
@@ -215,7 +229,7 @@ class Igra():
         zetoni1 = {x for x in self.zetoni[:9] if x not in ['izlocen', 'zacetek']}
         zetoni2 = {x for x in self.zetoni[9:] if x not in ['izlocen', 'zacetek']}
 
-        r3 = len(zetoni1) - len(zetoni2)
+        r3 = self.zetoni[9:].count('izlocen') - self.zetoni[:9].count('izlocen')
         dvojke1 = []
         dvojke2 = []
 
@@ -268,14 +282,11 @@ class Igra():
         for zeton in zetoni1:
             if zeton not in ['izlocen', 'zacetek']:
                 if set(self.sosedi[zeton]) <= zetoni2:
-                    r3 -= 1
+                    r2 -= 1
 
         for zeton in zetoni2:
             if zeton not in ['izlocen', 'zacetek']:
                 if set(self.sosedi[zeton]) <= zetoni1:
-                    r3 += 1
+                    r2 += 1
 
-        return (r1, r2, r3, r4, r5)           
-        
-
-        
+        return (r1, r2, r3, r4, r5)

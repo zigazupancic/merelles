@@ -349,11 +349,11 @@ class GUI():
                 ime = self.ime_2
                 nasprotnik = self.ime_1
             self.napis.set("{}, vzemi žeton igralca {}.".format(ime, nasprotnik))
-            
+
 
 class Clovek():
     """Igralec razreda Clovek"""
-    
+
     def __init__(self, gui, tezavnost):
         """Objekt razreda Clovek povezemo z igralno plosco in naredimo atribute, ki bodo hranili klike"""
         self.gui = gui
@@ -391,7 +391,7 @@ class Racunalnik():
     def __init__(self, gui, tezavnost):
         """Objekt razreda Racunalnik povezemo z igralno plosco"""
         self.gui = gui
-        self.algoritem = Minimax(5)
+        self.algoritem = Minimax(6)
         self.mislec = None
 
     def igraj(self):
@@ -475,10 +475,8 @@ class Minimax:
         vrednosti = self.igra.ocena_postavitve()
         if self.jaz is game_logic.IGRALEC_1:
             if self.igra.faza_igre == 1:
+                #koeficienti = (0,0,1,0,0)
                 koeficienti = (26, 1, 6, 12, 7)
-                ocena = 0
-                for i in range(5):
-                    ocena += koeficienti[i] * vrednosti[i]
             elif self.igra.zetoni[:9].count('izlocen') >= 6:
                 koeficienti = (0, 0, 0, 10, 1)
             else:
@@ -486,13 +484,11 @@ class Minimax:
             ocena = 0
             for i in range(5):
                 ocena += koeficienti[i] * vrednosti[i]
-            return ocena * (-1)
+            return ocena
         else:
             if self.igra.faza_igre == 1:
+                #koeficienti = (0,0,1,0,0)
                 koeficienti = (26, 1, 6, 12, 7)
-                ocena = 0
-                for i in range(5):
-                    ocena += koeficienti[i] * vrednosti[i]
             elif self.igra.zetoni[9:].count('izlocen') >= 6:
                 koeficienti = (0, 0, 0, 10, 1)
             else:
@@ -500,7 +496,7 @@ class Minimax:
             ocena = 0
             for i in range(5):
                 ocena += koeficienti[i] * vrednosti[i]
-            return ocena
+            return -ocena
 
     def minimax(self, globina, alfa, beta, maksimiziramo):
         """Glavna metoda minimax."""
@@ -588,7 +584,7 @@ class Minimax:
                 assert (najboljsa_poteza is not (None, None, None)), "minimax: izračunana poteza je None"
                 return (najboljsa_poteza, vrednost_najboljse)
 
-                
+
 if __name__ == "__main__":
     # Ustvarimo glavno okno igre
     root = tk.Tk()

@@ -276,27 +276,15 @@ class GUI():
         def razdalja(x1, y1, x2, y2):
             return (x1 - x2) ** 2 + (y1 - y2) ** 2
 
-        def ponastavi_barve_zetonov():
-            for krogec in self.narisani_zetoni[:9]:
-                self.plosca.itemconfig(krogec, fill=GUI.BARVA_IGRALEC_1)
-            for krogec in self.narisani_zetoni[9:]:
-                self.plosca.itemconfig(krogec, fill=GUI.BARVA_IGRALEC_2)
-
         for id_zetona in range(18):
             a, b, c, d = self.plosca.coords(self.narisani_zetoni[id_zetona])
             if self.plosca.itemcget(self.narisani_zetoni[id_zetona], "state") == "normal" and \
                razdalja((a+c)/2, (b+d)/2, event.x, event.y) <= polmer_klika ** 2:
                 if self.igra.na_potezi == game_logic.IGRALEC_1:
                     self.igralec_1.klik(id_zetona, "ZETON")
-                    ponastavi_barve_zetonov()
-                    if id_zetona < 9:
-                        self.plosca.itemconfig(self.narisani_zetoni[id_zetona], fill=GUI.BARVA_IGRALEC_1_PRITISNJEN)
                     return
                 else:
                     self.igralec_2.klik(id_zetona, "ZETON")
-                    ponastavi_barve_zetonov()
-                    if id_zetona >= 9:
-                        self.plosca.itemconfig(self.narisani_zetoni[id_zetona], fill=GUI.BARVA_IGRALEC_2_PRITISNJEN)
                     return
 
         for krizisce in self.koordinate:
@@ -312,11 +300,6 @@ class GUI():
     def povleci_potezo(self, vrsta_poteze, zeton, polje=None):
         """Sprejme vrsto_poteze (PREMAKNI ali JEMLJI), zeton in po moznosti se polje (za PREMAKNI) ter odigra potezo.
         Veljavnost poteze je preverila ze metoda klik"""
-
-        for krogec in self.narisani_zetoni[:9]:
-            self.plosca.itemconfig(krogec, fill=GUI.BARVA_IGRALEC_1)
-        for krogec in self.narisani_zetoni[9:]:
-            self.plosca.itemconfig(krogec, fill=GUI.BARVA_IGRALEC_2)
 
         if vrsta_poteze is "PREMAKNI":
             self.igra.odigraj_potezo(zeton, polje)
@@ -369,15 +352,36 @@ class Clovek():
 
     def klik(self, koordinata, objekt):
         """Sprejme koordinato in vrsto objekta in ustrezno nadaljuje igro"""
+
+        def ponastavi_barve_zetonov():
+            """Ponastavi barve vseh žetonov na običajne vrednosti"""
+            for krogec in self.gui.narisani_zetoni[:9]:
+                self.gui.plosca.itemconfig(krogec, fill=GUI.BARVA_IGRALEC_1)
+            for krogec in self.gui.narisani_zetoni[9:]:
+                self.gui.plosca.itemconfig(krogec, fill=GUI.BARVA_IGRALEC_2)
+
         # Prvic smo kliknili na svoj zeton ali izberemo drug svoj zeton, ki ga zelimo premakniti
         # Koordinata je indeks nasega zetona (metoda klik_na_plosco ze prej preveri, da zeton ni nasprotnikov)
         if (self.prvi_klik is None or (self.drugi_klik, self.tretji_klik) == (None, None)) and objekt is "ZETON":
             self.prvi_klik = koordinata
+
+            # Obarvanje žetona ob kliku.
+            # Najprej ponastavi barve vseh žetonov, zatem preveri, če je na potezi prvi igralec in je izbran žeton
+            # njegov, ter ga pobarva če je, nato enako stori za drugega igralca.
+            ponastavi_barve_zetonov()
+            if self.gui.igra.na_potezi == game_logic.IGRALEC_1 and koordinata < 9 and \
+                    (self.gui.igra.faza_igre == 2 or self.gui.igra.zetoni[koordinata] == "zacetek"):
+                self.gui.plosca.itemconfig(self.gui.narisani_zetoni[koordinata], fill=GUI.BARVA_IGRALEC_1_PRITISNJEN)
+            elif self.gui.igra.na_potezi == game_logic.IGRALEC_2 and koordinata >= 9 and \
+                    (self.gui.igra.faza_igre == 2 or self.gui.igra.zetoni[koordinata] == "zacetek"):
+                self.gui.plosca.itemconfig(self.gui.narisani_zetoni[koordinata], fill=GUI.BARVA_IGRALEC_2_PRITISNJEN)
+
         # Koordinata sedaj predstavlja polje na igralni plosci
         elif (self.prvi_klik is not None and self.drugi_klik is None and objekt is "PLOSCA" and
               self.gui.igra.veljavna_poteza(self.prvi_klik, koordinata)):
             self.drugi_klik = koordinata
             self.gui.povleci_potezo("PREMAKNI", self.prvi_klik, self.drugi_klik)
+            ponastavi_barve_zetonov()
         # Koordinata je indeks nasprotnikovega zetona, ki ga zelimo vzeti
         elif (self.tretji_klik is None and self.drugi_klik is not None and objekt is "ZETON" and
               self.gui.igra.veljavni_zakljucek(koordinata)):

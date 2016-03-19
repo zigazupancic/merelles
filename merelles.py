@@ -2,7 +2,6 @@
 import tkinter as tk     # Knjižnica za grafični vmesnik.
 import game_logic        # Knjižnica za logiko igre.
 import threading
-import random
 
 
 class GUI():
@@ -29,7 +28,6 @@ class GUI():
         self.igra = None                         # Ob začetku nove igra, bo to objekt razreda Igra.
         self.ime_1 = "Rdeči"                     # Privzeto ime prvega igralca.
         self.ime_2 = "Zeleni"                    # Privzeto ime drugega igralca.
-        self.new_game = None                     # Okno za nastavitev nove igre, ko ni odprto je None.
         self.about = None                        # Okno za podatke o igri, ko ni odprto je None.
         self.help = None                         # Okno za pomoč pri igranju igre, ko ni odprto je None.
 
@@ -141,52 +139,41 @@ class GUI():
             else:
                 igralec_2 = Racunalnik
             self.nova_igra(igralec_1, igralec_2, izbrana_tezavnost.get())
-            self.new_game.destroy()
-            self.new_game = None
-
-        def preklici():
-            """Pomožna funkcija, ki zapre okno in nastavi atribut self.new_game na None."""
-            self.new_game.destroy()
-            self.new_game = None
-
-        # Preveri, če je okno že ustvarjeno, če je ga da na vrh in se vrne.
-        if self.new_game is not None:
-            self.new_game.lift()
-            return
+            new_game.destroy()
 
         # Ustvari novo okno za izbiro nastavitev nove igre.
-        self.new_game = tk.Toplevel()
-        self.new_game.protocol("WM_DELETE_WINDOW", preklici)
-        self.new_game.title("Merelles - Nova igra")                # Naslov okna
-        self.new_game.resizable(width=False, height=False)         # Velikosti okna ni mogoče spreminjati
+        new_game = tk.Toplevel()
+        new_game.grab_set()                                   # Postavi fokus na okno in ga obdrži
+        new_game.title("Merelles - Nova igra")                # Naslov okna
+        new_game.resizable(width=False, height=False)         # Velikosti okna ni mogoče spreminjati
 
-        self.new_game.grid_columnconfigure(0, minsize=120)         # Nastavitev minimalne širine ničtega stolpca
-        self.new_game.grid_columnconfigure(2, minsize=150)         # Nastavitev minimalne širine drugega stolpca
-        self.new_game.grid_rowconfigure(0, minsize=80)             # Nastavitev minimalne višine ničte vrstice
-        self.new_game.grid_rowconfigure(5, minsize=70)             # Nastavitev minimalne višine pete vrstice
-        self.new_game.grid_rowconfigure(9, minsize=80)             # Nastavitev minimalne višine devete vrstice
+        new_game.grid_columnconfigure(0, minsize=120)         # Nastavitev minimalne širine ničtega stolpca
+        new_game.grid_columnconfigure(2, minsize=150)         # Nastavitev minimalne širine drugega stolpca
+        new_game.grid_rowconfigure(0, minsize=80)             # Nastavitev minimalne višine ničte vrstice
+        new_game.grid_rowconfigure(5, minsize=70)             # Nastavitev minimalne višine pete vrstice
+        new_game.grid_rowconfigure(9, minsize=80)             # Nastavitev minimalne višine devete vrstice
 
-        tk.Label(self.new_game, text="Nastavitve nove igre", font=("Helvetica", 20)).grid(row=0, column=0, columnspan=4)
+        tk.Label(new_game, text="Nastavitve nove igre", font=("Helvetica", 20)).grid(row=0, column=0, columnspan=4)
 
         # Nastavitve težavnosti
         # ---------------------------------------------------------
-        tk.Label(self.new_game, text="Izberite težavnost:").grid(row=1, column=1, sticky="W")
+        tk.Label(new_game, text="Izberite težavnost:").grid(row=1, column=1, sticky="W")
         tezavnosti = [("Težko", 3), ("Srednje", 2), ("Lahko", 1)]  # Možne težavnosti
         izbrana_tezavnost = tk.IntVar()                            # Spremenljivka kamor shranimo izbrano težavnost
         izbrana_tezavnost.set(2)                                   # Nastavitev privzete vrednosti
 
         # Ustvari radijske gumbe za izbrio težavnosti:
         for vrstica, (besedilo, vrednost) in enumerate(tezavnosti):
-            tk.Radiobutton(self.new_game, text=besedilo, variable=izbrana_tezavnost, value=vrednost, width=10,
+            tk.Radiobutton(new_game, text=besedilo, variable=izbrana_tezavnost, value=vrednost, width=10,
                            anchor="w").grid(row=vrstica + 2, column=1)
         # ---------------------------------------------------------
 
         # Nastavitve igralcev
         # ---------------------------------------------------------
-        tk.Label(self.new_game, text="IGRALEC 1", font=("Helvetica", 13)).grid(row=5, column=0, sticky="E")
-        tk.Label(self.new_game, text="IGRALEC 2", font=("Helvetica", 13)).grid(row=5, column=2, sticky="E")
-        tk.Label(self.new_game, text="Vrsta igralca:").grid(row=6, column=0, rowspan=2, sticky="E")
-        tk.Label(self.new_game, text="Vrsta igralca:").grid(row=6, column=2, rowspan=2, sticky="E")
+        tk.Label(new_game, text="IGRALEC 1", font=("Helvetica", 13)).grid(row=5, column=0, sticky="E")
+        tk.Label(new_game, text="IGRALEC 2", font=("Helvetica", 13)).grid(row=5, column=2, sticky="E")
+        tk.Label(new_game, text="Vrsta igralca:").grid(row=6, column=0, rowspan=2, sticky="E")
+        tk.Label(new_game, text="Vrsta igralca:").grid(row=6, column=2, rowspan=2, sticky="E")
 
         igralec_1_clovek = tk.BooleanVar()                         # Spremenljivka kamor shranimo vrsto prvega igralca
         igralec_1_clovek.set(True)                                 # Privzeta vrednost vrste prvega igralca
@@ -197,24 +184,24 @@ class GUI():
 
         # Ustvari radijske gumbe za izbiro vrste igralcev
         for besedilo, vrednost, spremenljivka, vrstica, stolpec in igralci:
-            tk.Radiobutton(self.new_game, text=besedilo, variable=spremenljivka, value=vrednost, width=10, anchor="w")\
+            tk.Radiobutton(new_game, text=besedilo, variable=spremenljivka, value=vrednost, width=10, anchor="w")\
                 .grid(row=vrstica, column=stolpec)
 
-        tk.Label(self.new_game, text="Ime igralca:").grid(row=8, column=0, sticky="E")
-        tk.Label(self.new_game, text="Ime igralca:").grid(row=8, column=2, sticky="E")
+        tk.Label(new_game, text="Ime igralca:").grid(row=8, column=0, sticky="E")
+        tk.Label(new_game, text="Ime igralca:").grid(row=8, column=2, sticky="E")
 
-        ime_1 = tk.Entry(self.new_game, font="Helvetica 12", width=10)  # Vnosno polje za ime prvega igralca
+        ime_1 = tk.Entry(new_game, font="Helvetica 12", width=10)  # Vnosno polje za ime prvega igralca
         ime_1.grid(row=8, column=1)
         ime_1.insert(0, self.ime_1)                                     # Privzeto ime prvega igralca
-        ime_2 = tk.Entry(self.new_game, font="Helvetica 12", width=10)  # Vnosno polje za ime drugega igralca
+        ime_2 = tk.Entry(new_game, font="Helvetica 12", width=10)  # Vnosno polje za ime drugega igralca
         ime_2.grid(row=8, column=3)
         ime_2.insert(0, self.ime_2)                                     # Privzeto ime drugega igralca
         # ---------------------------------------------------------
 
         # Gumba za začetek nove igre in preklic
-        tk.Button(self.new_game, text="Prekliči", width=20, height=2,
-                  command=lambda: preklici()).grid(row=9, column=0, columnspan=3, sticky="E")
-        tk.Button(self.new_game, text="Začni igro", width=20, height=2,
+        tk.Button(new_game, text="Prekliči", width=20, height=2,
+                  command=lambda: new_game.destroy()).grid(row=9, column=0, columnspan=3, sticky="E")
+        tk.Button(new_game, text="Začni igro", width=20, height=2,
                   command=lambda: ustvari_igro()).grid(row=9, column=3, columnspan=3, sticky="E")
 
     def nova_igra(self, igralec_1, igralec_2, tezavnost=2):

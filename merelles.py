@@ -286,7 +286,11 @@ class GUI():
 
     def povleci_potezo(self, vrsta_poteze, zeton, polje=None):
         """Sprejme vrsto_poteze (PREMAKNI ali JEMLJI), zeton in po moznosti se polje (za PREMAKNI) ter odigra potezo.
-        Veljavnost poteze je preverila ze metoda klik"""
+        Veljavnost poteze je preverila ze metoda klik
+        :param vrsta_poteze: kaksne vrste potezo naj povlece "VZEMI" ali "PREMAKNI"
+        :param zeton: pri "PREMAKNI" je to id zetona, ki bo premaknjen, pri "VZEMI" pa tak, ki bo pojeden
+        :param polje: pri "PREMAKNI" je to koordinata polja, kamor bo premaknjen zeton
+        """
 
         if vrsta_poteze is "PREMAKNI":
             self.igra.odigraj_potezo(zeton, polje)
@@ -338,7 +342,10 @@ class Clovek():
         self.tretji_klik = None
 
     def klik(self, koordinata, objekt):
-        """Sprejme koordinato in vrsto objekta in ustrezno nadaljuje igro"""
+        """Sprejme koordinato in vrsto objekta in ustrezno nadaljuje igro
+        :param koordinata: ce je objekt "ZETON", potem id zetona, ce je objekt "PLOSCA", potem koordinata na plosci
+        :param objekt: "ZETON" ali "PLOSCA" odvisno, kam je uporabnik kliknil
+        """
 
         def ponastavi_barve_zetonov():
             """Ponastavi barve vseh žetonov na običajne vrednosti"""
@@ -422,8 +429,9 @@ class Racunalnik():
             self.mislec = None
 
     def klik(self, koordinata, objekt):
-        """Racunalnik ignorira vse klike"""
+        # Racunalnik ignorira vse klike.
         pass
+
 
 class Minimax:
     # Algoritem minimax predstavimo z objektom, ki hrani stanje igre in
@@ -431,11 +439,11 @@ class Minimax:
     # v drugem vlaknu kot tkinter).
 
     def __init__(self, globina):
-        self.globina = globina  # do katere globine iščemo?
-        self.prekinitev = False # ali moramo končati?
-        self.igra = None # objekt, ki opisuje igro (ga dobimo kasneje)
-        self.jaz = None  # katerega igralca igramo (podatek dobimo kasneje)
-        self.poteza = None # sem napišemo potezo, ko jo najdemo
+        self.globina = globina        # do katere globine iščemo?
+        self.prekinitev = False       # ali moramo končati?
+        self.igra = None              # objekt, ki opisuje igro (ga dobimo kasneje)
+        self.jaz = None               # katerega igralca igramo (podatek dobimo kasneje)
+        self.poteza = None            # sem napišemo potezo, ko jo najdemo
 
     def prekini(self):
         """Metoda, ki jo pokliče GUI, če je treba nehati razmišljati, ker
@@ -443,12 +451,14 @@ class Minimax:
         self.prekinitev = True
 
     def izracunaj_potezo(self, igra):
-        """Izračunaj potezo za trenutno stanje dane igre."""
+        """Izračunaj potezo za trenutno stanje dane igre.
+        :param igra: objekt igre, za katero racunamo naslednjo potezo, pri trenutnem stanju
+        """
         # To metodo pokličemo iz vzporednega vlakna
         self.igra = igra
-        self.prekinitev = False # Glavno vlakno bo to nastavilo na True, če moramo nehati
+        self.prekinitev = False       # Glavno vlakno bo to nastavilo na True, če moramo nehati
         self.jaz = self.igra.na_potezi
-        self.poteza = None # Sem napišemo potezo, ko jo najdemo
+        self.poteza = None            # Sem napišemo potezo, ko jo najdemo
         # Poženemo minimax
         (poteza, vrednost) = self.minimax(self.globina, -Minimax.NESKONCNO, Minimax.NESKONCNO, True)
         self.jaz = None
@@ -458,15 +468,15 @@ class Minimax:
             self.poteza = poteza
 
     # Vrednosti igre
-    ZMAGA = 100000 # Mora biti vsaj 10^5
-    NESKONCNO = ZMAGA + 1 # Več kot zmaga
+    ZMAGA = 100000           # Mora biti vsaj 10^5
+    NESKONCNO = ZMAGA + 1    # Več kot zmaga
 
     def vrednost_pozicije(self):
         """Ocena vrednosti pozicije"""
         vrednosti = self.igra.ocena_postavitve()
         if self.jaz is game_logic.IGRALEC_1:
             if self.igra.faza_igre == 1:
-                #koeficienti = (0,0,1,0,0)
+                # koeficienti = (0,0,1,0,0)
                 koeficienti = (26, 1, 6, 12, 7, 1)
             elif self.igra.zetoni[:9].count('izlocen') >= 6:
                 koeficienti = (0, 0, 0, 10, 1, 0)
@@ -478,7 +488,7 @@ class Minimax:
             return ocena
         else:
             if self.igra.faza_igre == 1:
-                #koeficienti = (0,0,1,0,0)
+                # koeficienti = (0,0,1,0,0)
                 koeficienti = (26, 1, 6, 12, 7, 1)
             elif self.igra.zetoni[9:].count('izlocen') >= 6:
                 koeficienti = (0, 0, 0, 10, 1, 0)
@@ -490,19 +500,24 @@ class Minimax:
             return -ocena
 
     def minimax(self, globina, alfa, beta, maksimiziramo):
-        """Glavna metoda minimax."""
+        """Glavna metoda minimax.
+        :param globina: globina algoritma minimax (koliko potez vnaprej pogleda)
+        :param alfa: najvecja vrednost zagotovljena za maximiziranje
+        :param beta: najmanja vrednost zagotovljena za minimiziranje
+        :param maksimiziramo: True, ce maksimiziramo, False, ce minimiziramo
+        """
         if self.prekinitev:
-            return (None, None, None, 0)
+            return None, None, None, 0
         if self.igra.konec_igre:
             # Igre je konec, vrnemo njeno vrednost
             if self.igra.zmagovalec == self.jaz:
-                return ((None, None, None), Minimax.ZMAGA)
+                return (None, None, None), Minimax.ZMAGA
             else:
-                return ((None, None, None), -Minimax.ZMAGA)
+                return (None, None, None), -Minimax.ZMAGA
         else:
             # Igre ni konec
             if globina == 0:
-                return ((None, None, None), self.vrednost_pozicije())
+                return (None, None, None), self.vrednost_pozicije()
             else:
                 # Naredimo eno stopnjo minimax
                 if maksimiziramo:
@@ -573,7 +588,7 @@ class Minimax:
                                 break
 
                 assert (najboljsa_poteza is not (None, None, None)), "minimax: izračunana poteza je None"
-                return (najboljsa_poteza, vrednost_najboljse)
+                return najboljsa_poteza, vrednost_najboljse
 
 
 if __name__ == "__main__":

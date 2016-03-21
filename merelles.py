@@ -207,6 +207,11 @@ class GUI():
     def nova_igra(self, igralec_1, igralec_2, tezavnost=2):
         d = GUI.VELIKOST_ODSEKA
 
+        if self.igralec_1 is not None:
+            self.igralec_1.prekini()
+        if self.igralec_2 is not None:
+            self.igralec_2.prekini()
+
         self.igralec_1 = igralec_1(self, tezavnost)
         self.igralec_2 = igralec_2(self, tezavnost)
         self.igra = game_logic.Igra()
@@ -220,6 +225,7 @@ class GUI():
             self.narisani_zetoni.append(self.plosca.create_oval(
                 0.325*d, 6*d - d*zeton, 0.925*d, 6.6*d - d*zeton, fill=GUI.BARVA_IGRALEC_1, tags="zeton",
                 state="normal", width=0.03*d))
+
         for zeton in range(4):
             self.narisani_zetoni.append(self.plosca.create_oval(
                 1.575*d, 6*d - d*zeton, 2.175*d, 6.6*d - d*zeton, fill=GUI.BARVA_IGRALEC_1, tags="zeton",
@@ -382,6 +388,9 @@ class Clovek():
             self.tretji_klik = koordinata
             self.gui.povleci_potezo("VZEMI", self.tretji_klik)
 
+    def prekini(self):
+        pass
+
 
 class Racunalnik():
     """Igralec razreda Racunalnik"""
@@ -507,7 +516,7 @@ class Minimax:
         :param maksimiziramo: True, ce maksimiziramo, False, ce minimiziramo
         """
         if self.prekinitev:
-            return None, None, None, 0
+            return (None, None, None), 0
         if self.igra.konec_igre:
             # Igre je konec, vrnemo njeno vrednost
             if self.igra.zmagovalec == self.jaz:

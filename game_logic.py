@@ -3,7 +3,7 @@ IGRALEC_2 = 'igralec_2'
 
 class Igra():
     def __init__(self):
-        # naredi prazno igralco plosco
+        # Naredi prazno igralno plosco.
         self.igralna_plosca = [None] * 24
         # na potezo postavi prvega igralca
         self.na_potezi = IGRALEC_1
@@ -31,16 +31,19 @@ class Igra():
         # pove, kdo je zmagovalec igre
         self.zmagovalec = None
         # vsebuje vse podatke o trenutnem stanju:
-        # self.igralna_plosca, self.zetoni, self.na_potezi, self.faza_igre, self.konec_poteze, self.konec_igre in self.zmagovalec
+        # self.igralna_plosca, self.zetoni, self.na_potezi, self.faza_igre, self.konec_igre in self.zmagovalec
         self.zgodovina = []
 
     def shrani_zgodovino(self):
+        """Doda trenutno stanje igre v zgodovino."""
         self.zgodovina.append((self.igralna_plosca[:], self.zetoni[:], self.na_potezi, self.faza_igre, self.konec_igre, self.zmagovalec))
 
     def razveljavi(self):
+        """Odstrani zadnji vnos iz zgodovine, ponastavi igro na prejsnje stanje."""
         (self.igralna_plosca, self.zetoni, self.na_potezi, self.faza_igre, self.konec_igre, self.zmagovalec) = self.zgodovina.pop()
 
     def kopija_igre(self):
+        """Ustvari kopijo igre, s pomocjo katere racunalnik razmislja."""
         k = Igra()
         k.igralna_plosca = self.igralna_plosca[:]
         k.zetoni = self.zetoni[:]
@@ -51,9 +54,10 @@ class Igra():
         return k
 
     def veljavna_poteza(self, zeton, zeljeno_polje):
-        """Dobi index zetona, fazo igre (1-2) in index polja kamor zelimo zeton postaviti"""
+        """Dobi index zetona, fazo igre (1-2) in index polja, kamor zelimo zeton postaviti."""
         if self.zetoni[zeton] is "izlocen":
             return False
+        # Preveri, ce zeton ne pripada igralcu.
         if self.na_potezi is IGRALEC_1 and zeton >= 9 or self.na_potezi is IGRALEC_2 and zeton < 9:
             return False
         if self.faza_igre == 1:
@@ -76,29 +80,24 @@ class Igra():
             return False
 
     def veljavni_zakljucek(self, zeton):
-        """Dobi indeks zetona, ki ga zelimo vzeti in preveri, ce je to veljavno"""
+        """Dobi indeks zetona, ki ga zelimo vzeti in preveri, ce je to veljavno."""
+        # Spremenljivka mesto je mesto v seznamu pri katerem se zacnejo zetoni danega igralca
         if self.na_potezi is IGRALEC_1:
-            #indeksi nasprotnikovih zetonov, ki se nahajajo na plosci (nimajo statusa False ali None)
-            izbire = [i for i in range(9, 18) if self.zetoni[i] not in ["izlocen", "zacetek"]]
-            if zeton not in izbire:
-                return False
-            ali_so_v_trojki = [self.nova_trojka(i) for i in izbire]
-            # ce so vsi v trojkah, si lahko izbere kateregakoli s plosce
-            if ali_so_v_trojki.count(True) == len(ali_so_v_trojki):
-                return True
-            else:
-                return not self.nova_trojka(zeton)
+            mesto = 9
         else:
-            #indeksi nasprotnikovih zetonov, ki se nahajajo na plosci (nimajo statusa False ali None)
-            izbire = [i for i in range(9) if self.zetoni[i] not in ["izlocen", "zacetek"]]
-            if zeton not in izbire:
-                return False
-            ali_so_v_trojki = [self.nova_trojka(i) for i in izbire]
-            #ce so vsi v trojkah, si lahko izbere kateregakoli s plosce
-            if ali_so_v_trojki.count(True) == len(ali_so_v_trojki):
-                return True
-            else:
-                return not self.nova_trojka(zeton)
+            mesto = 0
+
+        # Indeksi nasprotnikovih zetonov, ki se nahajajo na plosci (nimajo statusa "zacetek" ali "izlocen")
+        izbire = [i for i in range(mesto, mesto + 9) if self.zetoni[i] not in ["izlocen", "zacetek"]]
+        if zeton not in izbire:
+            return False
+        elif not self.nova_trojka(zeton):
+            return True
+        else:
+            for i in izbire:
+                if not self.nova_trojka(i):
+                    return False
+        return True
 
     def odigraj_potezo(self, zeton, polje):
         """Sprejme indeks zetona in polje, kamor ga zelimo prestaviti.
@@ -226,6 +225,7 @@ class Igra():
         # r4 je razlika med številom "2 pieces configuration" igralca 1 in igralca 2
         # r5 je razlika med številom "3 pieces configuration" igralca 2 in igralca 2
         # r6 je razlika med številom zavzetih križišč igralca 1 in igralca 2
+
         r1, r2, r3, r4, r5, r6 = 0, 0, 0, 0, 0, 0
         zetoni1 = {x for x in self.zetoni[:9] if x not in ['izlocen', 'zacetek']}
         zetoni2 = {x for x in self.zetoni[9:] if x not in ['izlocen', 'zacetek']}

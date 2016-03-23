@@ -493,19 +493,19 @@ class Minimax:
             else:
                 koeficienti = (43, 10, 8, 0, 0, 0, 0)
             ocena = 0
-            for i in range(6):
+            for i in range(7):
                 ocena += koeficienti[i] * vrednosti[i]
             return ocena
         else:
             if self.igra.faza_igre == 1:
                 # koeficienti = (0,0,1,0,0)
-                koeficienti = (26, 1, 6, 12, 7, 1)
+                koeficienti = (26, 1, 6, 12, 7, 1, 0)
             elif self.igra.zetoni[9:].count('izlocen') >= 6:
-                koeficienti = (0, 0, 0, 10, 1, 0)
+                koeficienti = (0, 0, 0, 10, 1, 0, 7)
             else:
-                koeficienti = (43, 10, 8, 0, 0, 0)
+                koeficienti = (43, 10, 8, 0, 0, 0, 0)
             ocena = 0
-            for i in range(6):
+            for i in range(7):
                 ocena += koeficienti[i] * vrednosti[i]
             return -ocena
 

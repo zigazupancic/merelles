@@ -230,9 +230,10 @@ class Igra():
         if self.zetoni.count("zacetek") == 0:
             self.faza_igre = 2
         if self.faza_igre == 2:
-            if self.zgodovina[-5][0] == self.zgodovina[-1][0]:
+            if self.zgodovina[-4][0] == self.igralna_plosca:
                 self.ponovljene += 1
             else:
+                self.ponovljene = 0
                 self.ponovljene = 0
         if self.ponovljene == 4:
             self.konec_igre = True

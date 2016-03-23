@@ -2,7 +2,7 @@
 import tkinter as tk     # Knjižnica za grafični vmesnik.
 import game_logic        # Knjižnica za logiko igre.
 import threading
-
+import time
 
 class GUI():
     """Razred grafičnega vmesnika, ki izriše glavno okno komunicira med uporabnikom in igro."""
@@ -417,7 +417,7 @@ class Racunalnik():
 
     def preveri_potezo(self):
         """Vsakih 100ms preveri, ali je algoritem že izračunal potezo."""
-        if self.algoritem.poteza is not None:
+        if self.algoritem.poteza is not None and not self.algoritem.prekinitev:
             # Algoritem je našel potezo, povleci jo, če ni bilo prekinitve
             (a, b, c) = self.algoritem.poteza
             if c is None:

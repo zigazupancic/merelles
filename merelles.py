@@ -54,6 +54,7 @@ class GUI():
         # Ustvari platno plosca in ga postavi v okno
         d = GUI.VELIKOST_ODSEKA
         self.plosca = tk.Canvas(master, width=12 * d, height=7.5 * d)
+        #self.plosca.bind("<Configure>", self.on_resize)
         self.plosca.grid(row=1, column=1)
 
         # Ozadje plošče
@@ -249,6 +250,8 @@ class GUI():
             self.napis.set("Zmagovalec je {}. Nova igra?".format(self.ime_1))
         elif zmagovalec is game_logic.IGRALEC_2:
             self.napis.set("Zmagovalec je {}. Nova igra?".format(self.ime_2))
+        elif zmagovalec is "neodloceno":
+            self.napis.set("Igra je neodločena. Nova igra?".format(self.ime_2))
 
         self.plosca.itemconfig("zeton", state="disabled")
 
@@ -521,6 +524,8 @@ class Minimax:
             # Igre je konec, vrnemo njeno vrednost
             if self.igra.zmagovalec == self.jaz:
                 return (None, None, None), Minimax.ZMAGA
+            elif self.igra.zmagovalec == "neodloceno":
+                return (None, None, None), 0
             else:
                 return (None, None, None), -Minimax.ZMAGA
         else:

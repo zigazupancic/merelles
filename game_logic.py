@@ -34,13 +34,16 @@ class Igra():
         # self.igralna_plosca, self.zetoni, self.na_potezi, self.faza_igre, self.konec_igre in self.zmagovalec
         self.zgodovina = []
 
+        # vsebuje število ponovljenih potez
+        self.ponovljene = 0
+
     def shrani_zgodovino(self):
         """Doda trenutno stanje igre v zgodovino."""
-        self.zgodovina.append((self.igralna_plosca[:], self.zetoni[:], self.na_potezi, self.faza_igre, self.konec_igre, self.zmagovalec))
+        self.zgodovina.append((self.igralna_plosca[:], self.zetoni[:], self.na_potezi, self.faza_igre, self.konec_igre, self.zmagovalec, self.ponovljene))
 
     def razveljavi(self):
         """Odstrani zadnji vnos iz zgodovine, ponastavi igro na prejsnje stanje."""
-        (self.igralna_plosca, self.zetoni, self.na_potezi, self.faza_igre, self.konec_igre, self.zmagovalec) = self.zgodovina.pop()
+        (self.igralna_plosca, self.zetoni, self.na_potezi, self.faza_igre, self.konec_igre, self.zmagovalec, self.ponovljene) = self.zgodovina.pop()
 
     def kopija_igre(self):
         """Ustvari kopijo igre, s pomocjo katere racunalnik razmislja."""
@@ -51,6 +54,8 @@ class Igra():
         k.faza_igre = self.faza_igre
         k.konec_igre = self.konec_igre
         k.zmagovalec = self.zmagovalec
+        k.ponovljene = self.ponovljene
+        k.zgodovina = self.zgodovina
         return k
 
     def veljavna_poteza(self, zeton, zeljeno_polje):
@@ -217,6 +222,14 @@ class Igra():
         # vse zetone smo se polozili na plosco - pricne se premikanje zetonov po plosci
         if self.zetoni.count("zacetek") == 0:
             self.faza_igre = 2
+        if self.faza_igre == 2:
+            if self.zgodovina[-5][0] == self.zgodovina[-1][0]:
+                self.ponovljene += 1
+            else:
+                self.ponovljene = 0
+        if self.ponovljene == 4:
+            self.konec_igre = True
+            self.zmagovalec = "neodloceno"
 
     def ocena_postavitve(self):
         # r1 je razlika med številom trojk igralca 1 in igralca 2

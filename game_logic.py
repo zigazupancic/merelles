@@ -16,6 +16,13 @@ class Igra():
                        {21, 22, 23}, {0, 9, 21}, {3, 10, 18}, {6, 11, 15}, {1, 4, 7}, {16, 19, 22}, {8, 12, 17},
                        {5, 13, 20}, {2, 14, 23}]
 
+        self.manjkajoca = {}
+        for trojka in self.trojke:
+            a, b, c = sorted(trojka)
+            self.manjkajoca[(a, b)] = c
+            self.manjkajoca[(a, c)] = b
+            self.manjkajoca[(b, c)] = a
+
 
         # v seznamu self.zetoni ustreza indeks i zetonu i: "zacetek" - ni se vstopil v igro,
         # "izlocen" - je ze izlocen iz igre, n - nahaja se na igralni plosci na mestu n
@@ -238,8 +245,9 @@ class Igra():
         # r4 je razlika med številom "2 pieces configuration" igralca 1 in igralca 2
         # r5 je razlika med številom "3 pieces configuration" igralca 2 in igralca 2
         # r6 je razlika med številom zavzetih križišč igralca 1 in igralca 2
+        # r7 je razlika med številom odprtih trojk igralca 1 in igralca 2
 
-        r1, r2, r3, r4, r5, r6 = 0, 0, 0, 0, 0, 0
+        r1, r2, r3, r4, r5, r6, r7 = 0, 0, 0, 0, 0, 0, 0
         zetoni1 = {x for x in self.zetoni[:9] if x not in ['izlocen', 'zacetek']}
         zetoni2 = {x for x in self.zetoni[9:] if x not in ['izlocen', 'zacetek']}
 
@@ -287,17 +295,29 @@ class Igra():
                 dvojke2.append(mesta2)
                 r4 -= 1
 
-        for sez1 in dvojke1:
-            for sez2 in dvojke1:
-                if len(sez1 & sez2) == 1:
+        for dvojka1 in dvojke1:
+            for dvojka2 in dvojke1:
+                if len(dvojka1 & dvojka2) == 1:
                     r5 += 1
 
-        for sez1 in dvojke2:
-            for sez2 in dvojke2:
-                if len(sez1 & sez2) == 1:
+        for dvojka1 in dvojke2:
+            for dvojka2 in dvojke2:
+                if len(dvojka1 & dvojka2) == 1:
                     r5 -= 1
 
         r5 //= 2
+
+        for dvojka in dvojke1:
+            manjkajoca = self.manjkajoca[tuple(sorted(dvojka))]
+            sosedi = set(self.sosedi[manjkajoca]) & zetoni1
+            if len(sosedi - dvojka) >= 1:
+                r7 += 1
+
+        for dvojka in dvojke2:
+            manjkajoca = self.manjkajoca[tuple(sorted(dvojka))]
+            sosedi = set(self.sosedi[manjkajoca]) & zetoni2
+            if len(sosedi - dvojka) >= 1:
+                r7 -= 1
 
         for zeton in zetoni1:
             if zeton not in ['izlocen', 'zacetek']:
@@ -309,4 +329,4 @@ class Igra():
                 if set(self.sosedi[zeton]) <= (zetoni2 | zetoni1):
                     r2 += 1
 
-        return (r1, r2, r3, r4, r5, r6)
+        return (r1, r2, r3, r4, r5, r6, r7)

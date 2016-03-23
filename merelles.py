@@ -31,6 +31,7 @@ class GUI():
         self.about = None                        # Okno za podatke o igri, ko ni odprto je None.
         self.help = None                         # Okno za pomoč pri igranju igre, ko ni odprto je None.
 
+        self.master.resizable(width=False, height=False)         # Velikosti okna ni mogoče spreminjati
         # Glavni meni
         menu = tk.Menu(master)
         master.config(menu=menu)
@@ -44,7 +45,7 @@ class GUI():
         # Podmeni Pomoč
         menu_pomoc = tk.Menu(menu)
         menu.add_cascade(label="Pomoč", menu=menu_pomoc)
-        menu_pomoc.add_command(label="Kako igrati")  # TODO: Implementiraj okno z navodili za igro
+        menu_pomoc.add_command(label="Kako igrati", command=self.pomoc)
         menu_pomoc.add_command(label="O igri", command=self.o_igri)
 
         # Napis igre in polje za informacije
@@ -122,6 +123,43 @@ class GUI():
         tk.Label(self.about, text="Avtorja aplikacije: Žiga Zupančič in Juš Kosmač \n Licenca: MIT \n "
                                   "Aplikacija ustvarjena za Programiranje 2 (FMF) - 2016.",
                  justify="left").grid(row=2, column=0)
+
+    def pomoc(self):
+
+        def preklici():
+            """Pomožna funkcija, ki zapre okno in nastavi atribut self.help na None."""
+            self.help.destroy()
+            self.help = None
+
+        # Preveri, če je okno že ustvarjeno, če je ga da na vrh in se vrne.
+        if self.help is not None:
+            self.help.lift()
+            return
+
+        # Ustvari okno z informacijami o igri.
+        self.help = tk.Toplevel()
+        self.help.title("Kako igrati")
+        self.help.resizable(width=False, height=False)
+        self.help.protocol("WM_DELETE_WINDOW", preklici)
+
+        self.help.grid_columnconfigure(0, minsize=600)
+        self.help.grid_rowconfigure(0, minsize=80)             # Nastavitev minimalne višine ničte vrstice
+        self.help.grid_rowconfigure(2, minsize=80)             # Nastavitev minimalne višine druge vrstice
+
+        tk.Label(self.help, text="Navodila za igranje igre Merelles (Mlin)", font=("Helvetica", 20)).grid(row=0, column=0)
+
+        tk.Label(self.help, text="Vsak igralec na začetku igre prejme 9 žetonov svoje barve, \n"
+                                 "ki jih nato z nasprotnikom v prvi fazi igre izmenično postavljata \n"
+                                 "na igralno ploščo. Ko igralec v ravno vrsto postavi tri svoje \n"
+                                 "žetone, nasprotniku vzame žeton z igralne plošče. Ko oba igralca \n"
+                                 "postavita svojih 9 žetonov na igralno ploščo, se začne druga faza \n"
+                                 "igre, v kateri se lahko žetoni premikajo na sosednja polja. Igralca \n"
+                                 "s tem skušata poravnati svoje tri žetone v vrsto, da lahko jemljeta \n"
+                                 "žeton nasprotniku. Izgubi igralec, ki ima manj kot tri žetone, ali \n"
+                                 "nima več dovoljene poteze. Ko ima igralec le še tri žetone, \n"
+                                 "jih lahko poljubno premika po igralni plošči, torej skače. \n"
+                                 "Če se trikrat ponovi ista poteza, je rezultat neodločen.",
+                 justify="left").grid(row=1, column=0)
 
     def izbira_nove_igre(self):
         """Ustvari okno za izbiro nastavitev nove igre (če ne obstaja) ter začne novo igro, z izbranimi nastavitvami."""

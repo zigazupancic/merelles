@@ -54,7 +54,6 @@ class GUI():
         # Ustvari platno plosca in ga postavi v okno
         d = GUI.VELIKOST_ODSEKA
         self.plosca = tk.Canvas(master, width=12 * d, height=7.5 * d)
-        #self.plosca.bind("<Configure>", self.on_resize)
         self.plosca.grid(row=1, column=1)
 
         # Ozadje plošče
@@ -159,9 +158,9 @@ class GUI():
         # Nastavitve težavnosti
         # ---------------------------------------------------------
         tk.Label(new_game, text="Izberite težavnost:").grid(row=1, column=1, sticky="W")
-        tezavnosti = [("Težko", 3), ("Srednje", 2), ("Lahko", 1)]  # Možne težavnosti
+        tezavnosti = [("Težko", 5), ("Srednje", 4), ("Lahko", 2)]  # Možne težavnosti
         izbrana_tezavnost = tk.IntVar()                            # Spremenljivka kamor shranimo izbrano težavnost
-        izbrana_tezavnost.set(2)                                   # Nastavitev privzete vrednosti
+        izbrana_tezavnost.set(4)                                   # Nastavitev privzete vrednosti
 
         # Ustvari radijske gumbe za izbrio težavnosti:
         for vrstica, (besedilo, vrednost) in enumerate(tezavnosti):
@@ -401,7 +400,7 @@ class Racunalnik():
     def __init__(self, gui, tezavnost):
         """Objekt razreda Racunalnik povezemo z igralno plosco"""
         self.gui = gui
-        self.algoritem = Minimax(5)
+        self.algoritem = Minimax(tezavnost)
         self.mislec = None
 
     def igraj(self):
@@ -488,12 +487,11 @@ class Minimax:
         vrednosti = self.igra.ocena_postavitve()
         if self.jaz is game_logic.IGRALEC_1:
             if self.igra.faza_igre == 1:
-                # koeficienti = (0,0,1,0,0)
-                koeficienti = (26, 1, 6, 12, 7, 1)
+                koeficienti = (26, 1, 6, 12, 7, 1, 0)
             elif self.igra.zetoni[:9].count('izlocen') >= 6:
-                koeficienti = (0, 0, 0, 10, 1, 0)
+                koeficienti = (0, 0, 0, 10, 1, 0, 7)
             else:
-                koeficienti = (43, 10, 8, 0, 0, 0)
+                koeficienti = (43, 10, 8, 0, 0, 0, 0)
             ocena = 0
             for i in range(6):
                 ocena += koeficienti[i] * vrednosti[i]

@@ -51,12 +51,12 @@ class GUI():
 
         # Napis igre in polje za informacije
         self.napis = tk.StringVar(self.master, value="Na potezi je {}.".format(self.ime_1))
-        tk.Label(self.master, textvariable=self.napis, font=("Helvetica", 20)).grid(row=0, column=1)
+        tk.Label(self.master, textvariable=self.napis, font=("Helvetica", 20)).grid(row=0, column=0)
 
         # Ustvari platno plosca in ga postavi v okno
         d = GUI.VELIKOST_ODSEKA
         self.plosca = tk.Canvas(master, width=12 * d, height=7.5 * d)
-        self.plosca.grid(row=1, column=1)
+        self.plosca.grid(row=1, column=0)
 
         # Ozadje plošče
         self.plosca.create_rectangle(2.5 * d, 0.25 * d, 9.5 * d, 7.25 * d, fill="beige", width=0)
@@ -439,7 +439,7 @@ class Racunalnik():
     def __init__(self, gui, tezavnost):
         """Objekt razreda Racunalnik povezemo z igralno plosco"""
         self.gui = gui
-        self.algoritem = Minimax(tezavnost)
+        self.algoritem = Alfabeta(tezavnost)
         self.mislec = None
 
     def igraj(self):
@@ -456,16 +456,17 @@ class Racunalnik():
 
     def preveri_potezo(self):
         """Vsakih 100ms preveri, ali je algoritem že izračunal potezo."""
-        if self.algoritem.poteza is not None and not self.algoritem.prekinitev:
-            # Algoritem je našel potezo, povleci jo, če ni bilo prekinitve
-            (a, b, c) = self.algoritem.poteza
-            if c is None:
-                self.gui.povleci_potezo("PREMAKNI", a, b)
-            else:
-                self.gui.povleci_potezo("PREMAKNI", a, b)
-                self.gui.plosca.after(1000, lambda: self.gui.povleci_potezo("VZEMI", c))
-            # Vzporedno vlakno ni več aktivno, zato ga "pozabimo"
-            self.mislec = None
+        if self.algoritem.poteza is not None:
+            if not self.algoritem.prekinitev:
+                # Algoritem je našel potezo, povleci jo, če ni bilo prekinitve
+                (a, b, c) = self.algoritem.poteza
+                if c is None:
+                    self.gui.povleci_potezo("PREMAKNI", a, b)
+                else:
+                    self.gui.povleci_potezo("PREMAKNI", a, b)
+                    self.gui.plosca.after(1000, lambda: self.gui.povleci_potezo("VZEMI", c))
+                # Vzporedno vlakno ni več aktivno, zato ga "pozabimo"
+                self.mislec = None
         else:
             # Algoritem še ni našel poteze, preveri še enkrat čez 100ms
             self.gui.plosca.after(100, self.preveri_potezo)
@@ -484,8 +485,8 @@ class Racunalnik():
         pass
 
 
-class Minimax:
-    # Algoritem minimax predstavimo z objektom, ki hrani stanje igre in
+class Alfabeta:
+    # Algoritem alfabeta predstavimo z objektom, ki hrani stanje igre in
     # algoritma, nima pa dostopa do GUI (ker ga ne sme uporabljati, saj deluje
     # v drugem vlaknu kot tkinter).
 
@@ -512,8 +513,8 @@ class Minimax:
         self.poteza = None            # Sem napišemo potezo, ko jo najdemo
         # Zapomnimo si, koliko je ura
         time1 = time.time()
-        # Poženemo minimax
-        (poteza, vrednost) = self.minimax(self.globina, -Minimax.NESKONCNO, Minimax.NESKONCNO, True)
+        # Poženemo alfabeta
+        (poteza, vrednost) = self.alfabeta(self.globina, -Alfabeta.NESKONCNO, Alfabeta.NESKONCNO, True)
         self.jaz = None
         self.igra = None
         if not self.prekinitev:
@@ -555,9 +556,9 @@ class Minimax:
                 ocena += koeficienti[i] * vrednosti[i]
             return -ocena
 
-    def minimax(self, globina, alfa, beta, maksimiziramo):
-        """Glavna metoda minimax.
-        :param globina: globina algoritma minimax (koliko potez vnaprej pogleda)
+    def alfabeta(self, globina, alfa, beta, maksimiziramo):
+        """Glavna metoda alfabeta.
+        :param globina: globina algoritma alfabeta (koliko potez vnaprej pogleda)
         :param alfa: najvecja vrednost zagotovljena za maximiziranje
         :param beta: najmanja vrednost zagotovljena za minimiziranje
         :param maksimiziramo: True, ce maksimiziramo, False, ce minimiziramo
@@ -567,28 +568,28 @@ class Minimax:
         if self.igra.konec_igre:
             # Igre je konec, vrnemo njeno vrednost
             if self.igra.zmagovalec == self.jaz:
-                return (None, None, None), Minimax.ZMAGA
+                return (None, None, None), Alfabeta.ZMAGA
             elif self.igra.zmagovalec == "neodloceno":
                 return (None, None, None), 0
             else:
-                return (None, None, None), -Minimax.ZMAGA
+                return (None, None, None), -Alfabeta.ZMAGA
         else:
             # Igre ni konec
             if globina == 0:
                 return (None, None, None), self.vrednost_pozicije()
             else:
-                # Naredimo eno stopnjo minimax
+                # Naredimo eno stopnjo alfabeta
                 if maksimiziramo:
                     # Maksimiziramo
                     najboljsa_poteza = (None, None, None)
-                    vrednost_najboljse = -Minimax.NESKONCNO
+                    vrednost_najboljse = -Alfabeta.NESKONCNO
                     poteze = self.igra.veljavne_poteze()
                     random.shuffle(poteze)
                     for zeton, polje in poteze:
                         self.igra.odigraj_potezo(zeton, polje)
                         if self.igra.konec_poteze:
                             self.igra.konec_poteze = False
-                            vrednost = self.minimax(globina-1, alfa, beta, not maksimiziramo)[1]
+                            vrednost = self.alfabeta(globina - 1, alfa, beta, not maksimiziramo)[1]
                             self.igra.razveljavi()
                             if vrednost > vrednost_najboljse:
                                 vrednost_najboljse = vrednost
@@ -601,7 +602,7 @@ class Minimax:
                             for zeton_1 in self.igra.veljavni_zakljucki():
                                 self.igra.zakljucek_poteze(zeton_1)
                                 self.igra.konec_poteze = False
-                                vrednost = self.minimax(globina-1, alfa, beta, not maksimiziramo)[1]
+                                vrednost = self.alfabeta(globina - 1, alfa, beta, not maksimiziramo)[1]
                                 self.igra.razveljavi()
                                 if vrednost > vrednost_najboljse:
                                     vrednost_najboljse = vrednost
@@ -616,14 +617,14 @@ class Minimax:
                 else:
                     # Minimiziramo
                     najboljsa_poteza = (None, None, None)
-                    vrednost_najboljse = Minimax.NESKONCNO
+                    vrednost_najboljse = Alfabeta.NESKONCNO
                     poteze = self.igra.veljavne_poteze()
                     random.shuffle(poteze)
                     for zeton, polje in poteze:
                         self.igra.odigraj_potezo(zeton, polje)
                         if self.igra.konec_poteze:
                             self.igra.konec_poteze = False
-                            vrednost = self.minimax(globina-1, alfa, beta, not maksimiziramo)[1]
+                            vrednost = self.alfabeta(globina - 1, alfa, beta, not maksimiziramo)[1]
                             self.igra.razveljavi()
                             if vrednost < vrednost_najboljse:
                                 vrednost_najboljse = vrednost
@@ -636,7 +637,7 @@ class Minimax:
                             for zeton_1 in self.igra.veljavni_zakljucki():
                                 self.igra.zakljucek_poteze(zeton_1)
                                 self.igra.konec_poteze = False
-                                vrednost = self.minimax(globina-1, alfa, beta, not maksimiziramo)[1]
+                                vrednost = self.alfabeta(globina - 1, alfa, beta, not maksimiziramo)[1]
                                 self.igra.razveljavi()
                                 if vrednost < vrednost_najboljse:
                                     vrednost_najboljse = vrednost
@@ -649,7 +650,7 @@ class Minimax:
                             if beta <= alfa:
                                 break
 
-                assert (najboljsa_poteza is not (None, None, None)), "minimax: izračunana poteza je None"
+                assert (najboljsa_poteza is not (None, None, None)), "alfabeta: izračunana poteza je None"
                 return najboljsa_poteza, vrednost_najboljse
 
 

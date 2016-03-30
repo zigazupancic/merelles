@@ -17,7 +17,6 @@
 ## 5. teden
 * Programiranje igre za računalnik (programiranje, testiranje, dokumentiranje)
 * Končno testiranje in popravki
-* Generiranje dokumentacije
 
 ## 6. teden
 * Priprava na zagovor

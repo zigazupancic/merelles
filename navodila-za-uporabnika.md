@@ -1,5 +1,6 @@
 # O programu
 Aplikacija Merelles je napisana v programskem jeziku Python 3 z grafičnim vmesnikom, ki uporablja knjižnico `tkinter`.
+Program za računanje potez uporablja algoritem minimax izboljšan z alfa-beta rezanjem.
 
 Ob zagonu aplikacije se odpre glavno okno s ploščo in igra s privzetimi nastavitvami se začne (ČLOVEK-ČLOVEK).
 Če uporabnik želi igrati z računalnikom ali opazovati kako igrata dva računalnika, to lahko izbere v meniju `Igra` 
@@ -14,3 +15,7 @@ igre v meniju `Pomoč` z izbiro `Kako igrati`.
 Med igro je trenutno izbran žeton posebej označen. Če želimo izbrati drug žeton, preprosto kliknemo nanj. Če žetona ne moremo
 izbrati ali premakniti na željeno polje, pomeni da to ni v skladu s pravili igre (na primer: želimo prestaviti 
 nasprotnikov žeton ali premakniti žeton na polje, ki ni sosedno). 
+
+## Zagon programa
+Program zaženemo z ukazom:
+```python3 merelles.py```.

@@ -3,7 +3,6 @@ import tkinter as tk     # Knjižnica za grafični vmesnik.
 import game_logic        # Knjižnica za logiko igre.
 import threading
 import time
-import random
 
 class GUI():
     """Razred grafičnega vmesnika, ki izriše glavno okno komunicira med uporabnikom in igro."""
@@ -476,13 +475,12 @@ class Racunalnik():
                 self.gui.povleci_potezo("PREMAKNI", a, b)
             else:
                 self.gui.povleci_potezo("PREMAKNI", a, b)
-                self.gui.plosca.after(1000, lambda: self.gui.povleci_potezo("VZEMI", c))
+                self.gui.povleci_potezo("VZEMI", c)
             # Vzporedno vlakno ni več aktivno, zato ga "pozabimo"
             self.mislec = None
         else:
             # Algoritem še ni našel poteze, preveri še enkrat čez 100ms
             self.gui.plosca.after(100, self.preveri_potezo)
-
 
     def prekini(self):
         # To metodo kliče GUI, če je treba prekiniti razmišljanje.
@@ -523,18 +521,12 @@ class Minimax:
         self.prekinitev = False       # Glavno vlakno bo to nastavilo na True, če moramo nehati
         self.jaz = self.igra.na_potezi
         self.poteza = None            # Sem napišemo potezo, ko jo najdemo
-        # Zapomnimo si, koliko je ura
-        time1 = time.time()
         # Poženemo minimax
         (poteza, vrednost) = self.minimax(self.globina, -Minimax.NESKONCNO, Minimax.NESKONCNO, True)
         self.jaz = None
         self.igra = None
         if not self.prekinitev:
             # Potezo izvedemo v primeru, da nismo bili prekinjeni
-            # Počakamo, da mine vsaj ena sekunda:
-            dt = time.time() - time1
-            if dt < 1.0:
-                time.sleep(1 - dt)
             self.poteza = poteza
 
     # Vrednosti igre
@@ -595,9 +587,7 @@ class Minimax:
                     # Maksimiziramo
                     najboljsa_poteza = (None, None, None)
                     vrednost_najboljse = -Minimax.NESKONCNO
-                    poteze = self.igra.veljavne_poteze()
-                    random.shuffle(poteze)
-                    for zeton, polje in poteze:
+                    for zeton, polje in self.igra.veljavne_poteze():
                         self.igra.odigraj_potezo(zeton, polje)
                         if self.igra.konec_poteze:
                             self.igra.konec_poteze = False
@@ -630,9 +620,7 @@ class Minimax:
                     # Minimiziramo
                     najboljsa_poteza = (None, None, None)
                     vrednost_najboljse = Minimax.NESKONCNO
-                    poteze = self.igra.veljavne_poteze()
-                    random.shuffle(poteze)
-                    for zeton, polje in poteze:
+                    for zeton, polje in self.igra.veljavne_poteze():
                         self.igra.odigraj_potezo(zeton, polje)
                         if self.igra.konec_poteze:
                             self.igra.konec_poteze = False

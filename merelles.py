@@ -3,6 +3,7 @@ import tkinter as tk     # Knjižnica za grafični vmesnik.
 import game_logic        # Knjižnica za logiko igre.
 import threading
 import time
+import random
 
 class GUI():
     """Razred grafičnega vmesnika, ki izriše glavno okno komunicira med uporabnikom in igro."""
@@ -31,7 +32,7 @@ class GUI():
         self.about = None                        # Okno za podatke o igri, ko ni odprto je None.
         self.help = None                         # Okno za pomoč pri igranju igre, ko ni odprto je None.
 
-        self.master.resizable(width=False, height=False)         # Velikosti okna ni mogoče spreminjati
+        # self.master.resizable(width=False, height=False)         # Velikosti okna ni mogoče spreminjati
         # Glavni meni
         menu = tk.Menu(master)
         master.config(menu=menu)
@@ -48,14 +49,20 @@ class GUI():
         menu_pomoc.add_command(label="Kako igrati", command=self.pomoc)
         menu_pomoc.add_command(label="O igri", command=self.o_igri)
 
+        # Nastavimo layout manager
+        self.master.grid_columnconfigure(0, weight=1)
+        self.master.grid_rowconfigure(0, weight=0)
+        self.master.grid_rowconfigure(1, weight=1)
+
         # Napis igre in polje za informacije
         self.napis = tk.StringVar(self.master, value="Na potezi je {}.".format(self.ime_1))
-        tk.Label(self.master, textvariable=self.napis, font=("Helvetica", 20)).grid(row=0, column=1)
+        tk.Label(self.master, textvariable=self.napis, font=("Helvetica", 20)).grid(row=0, column=0)
 
         # Ustvari platno plosca in ga postavi v okno
         d = GUI.VELIKOST_ODSEKA
         self.plosca = tk.Canvas(master, width=12 * d, height=7.5 * d)
-        self.plosca.grid(row=1, column=1)
+        self.plosca.bind("<Configure>", self.spremeni_velikost)
+        self.plosca.grid(row=1, column=0, sticky=tk.NSEW)
 
         # Ozadje plošče
         self.plosca.create_rectangle(2.5 * d, 0.25 * d, 9.5 * d, 7.25 * d, fill="beige", width=0)
@@ -71,7 +78,7 @@ class GUI():
         # igralna plošča
         # ---------------------------------------------------------
         # Okvir
-        self.plosca.create_rectangle(3 * d, 0.75 * d, 9 * d, 6.75 * d, width=0.06 * d)
+        self.plosca.create_rectangle(3 * d, 0.75 * d, 9 * d, 6.75 * d, width=0.06 * d, tag="okvir")
         self.plosca.create_rectangle(4 * d, 1.75 * d, 8 * d, 5.75 * d, width=0.06 * d)
         self.plosca.create_rectangle(5 * d, 2.75 * d, 7 * d, 4.75 * d, width=0.06 * d)
 
@@ -93,6 +100,13 @@ class GUI():
 
         # Začne novo igro s privzetimi nastavitvami.
         self.nova_igra(Clovek, Clovek)
+
+    def spremeni_velikost(self, event):
+        width = self.plosca.winfo_width()
+        height = self.plosca.winfo_height()
+        # Tu bi morali zdaj na plošči popraviti razpored glede na velikost
+        print ("NOVA VELIKOST PLOŠČE JE {0} x {1}".format(width, height))
+
 
     def o_igri(self):
 
@@ -462,12 +476,13 @@ class Racunalnik():
                 self.gui.povleci_potezo("PREMAKNI", a, b)
             else:
                 self.gui.povleci_potezo("PREMAKNI", a, b)
-                self.gui.povleci_potezo("VZEMI", c)
+                self.gui.plosca.after(1000, lambda: self.gui.povleci_potezo("VZEMI", c))
             # Vzporedno vlakno ni več aktivno, zato ga "pozabimo"
             self.mislec = None
         else:
             # Algoritem še ni našel poteze, preveri še enkrat čez 100ms
             self.gui.plosca.after(100, self.preveri_potezo)
+
 
     def prekini(self):
         # To metodo kliče GUI, če je treba prekiniti razmišljanje.
@@ -508,12 +523,18 @@ class Minimax:
         self.prekinitev = False       # Glavno vlakno bo to nastavilo na True, če moramo nehati
         self.jaz = self.igra.na_potezi
         self.poteza = None            # Sem napišemo potezo, ko jo najdemo
+        # Zapomnimo si, koliko je ura
+        time1 = time.time()
         # Poženemo minimax
         (poteza, vrednost) = self.minimax(self.globina, -Minimax.NESKONCNO, Minimax.NESKONCNO, True)
         self.jaz = None
         self.igra = None
         if not self.prekinitev:
             # Potezo izvedemo v primeru, da nismo bili prekinjeni
+            # Počakamo, da mine vsaj ena sekunda:
+            dt = time.time() - time1
+            if dt < 1.0:
+                time.sleep(1 - dt)
             self.poteza = poteza
 
     # Vrednosti igre
@@ -574,7 +595,9 @@ class Minimax:
                     # Maksimiziramo
                     najboljsa_poteza = (None, None, None)
                     vrednost_najboljse = -Minimax.NESKONCNO
-                    for zeton, polje in self.igra.veljavne_poteze():
+                    poteze = self.igra.veljavne_poteze()
+                    random.shuffle(poteze)
+                    for zeton, polje in poteze:
                         self.igra.odigraj_potezo(zeton, polje)
                         if self.igra.konec_poteze:
                             self.igra.konec_poteze = False
@@ -607,7 +630,9 @@ class Minimax:
                     # Minimiziramo
                     najboljsa_poteza = (None, None, None)
                     vrednost_najboljse = Minimax.NESKONCNO
-                    for zeton, polje in self.igra.veljavne_poteze():
+                    poteze = self.igra.veljavne_poteze()
+                    random.shuffle(poteze)
+                    for zeton, polje in poteze:
                         self.igra.odigraj_potezo(zeton, polje)
                         if self.igra.konec_poteze:
                             self.igra.konec_poteze = False

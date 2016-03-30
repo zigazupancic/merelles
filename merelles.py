@@ -283,7 +283,7 @@ class GUI():
         self.napis.set("Na potezi je {}.".format(self.ime_1))
         self.igralec_1.igraj()
 
-    def koncaj_igro(self, zmagovalec=None):
+    def koncaj_igro(self, zmagovalec):
         if zmagovalec is game_logic.IGRALEC_1:
             self.napis.set("Zmagovalec je {}. Nova igra?".format(self.ime_1))
         elif zmagovalec is game_logic.IGRALEC_2:
@@ -485,7 +485,7 @@ class Racunalnik():
         pass
 
 
-class Alfabeta:
+class Alfabeta():
     # Algoritem alfabeta predstavimo z objektom, ki hrani stanje igre in
     # algoritma, nima pa dostopa do GUI (ker ga ne sme uporabljati, saj deluje
     # v drugem vlaknu kot tkinter).

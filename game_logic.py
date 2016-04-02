@@ -121,7 +121,7 @@ class Igra():
 
     def odigraj_potezo(self, zeton, polje):
         """Sprejme indeks zetona in polje, kamor ga zelimo prestaviti, ter odigra potezo.
-        Privzamemo, da je poteza veljavna - veljavnost bo preveril objekt razreda Igralec ali Racunalnik, preden poklice to metodo"""
+        Privzamemo, da je poteza veljavna - veljavnost bo preveril objekt razreda Clovek ali Racunalnik, preden poklice to metodo"""
         self.shrani_zgodovino()
         if self.zetoni[zeton] is "zacetek":
             # zeton prvic vstopi v igro
@@ -155,7 +155,7 @@ class Igra():
             return False
 
     def zakljucek_poteze(self, zeton=None):
-        """Sprejme indeks zetona, ki ga zelimo vzeti in ustrezno odigra - veljavnost te poteze bo ze prej preveril objekt razreda Igralec ali Racunalnik.
+        """Sprejme indeks zetona, ki ga zelimo vzeti in ustrezno odigra - veljavnost te poteze bo ze prej preveril objekt razreda Clovek ali Racunalnik.
         Privzeti parameter None pove, da ne bomo vzeli nobenega zetona."""
         if zeton is not None:
             self.shrani_zgodovino()

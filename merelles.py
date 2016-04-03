@@ -24,6 +24,9 @@ class GUI():
 
         # Nastavitev atributov
         self.master = master                     # Glavno okno.
+
+        # Ko želimo zapustiti igro, se pokliče self.izhod.
+        self.master.protocol("WM_DELETE_WINDOW", self.izhod)
         self.igralec_1 = None                    # Ob začetku nove igra, bo to objekt razreda Oseba ali Računalnik.
         self.igralec_2 = None                    # Ob začetku nove igra, bo to objekt razreda Oseba ali Računalnik.
         self.igra = None                         # Ob začetku nove igra, bo to objekt razreda Igra.
@@ -41,7 +44,7 @@ class GUI():
         menu_igra = tk.Menu(menu)
         menu.add_cascade(label="Igra", menu=menu_igra)
         menu_igra.add_command(label="Nova igra", command=self.izbira_nove_igre)
-        menu_igra.add_command(label="Izhod", command=master.destroy)
+        menu_igra.add_command(label="Izhod", command=self.izhod)
 
         # Podmeni Pomoč
         menu_pomoc = tk.Menu(menu)
@@ -94,6 +97,14 @@ class GUI():
 
         # Začne novo igro s privzetimi nastavitvami.
         self.nova_igra(Clovek, Clovek)
+
+    def izhod(self):
+        """Preden zapremo glavno okno, se prekine razmišljanje objekta Alfabeta."""
+        if self.igralec_1 is not None:
+            self.igralec_1.prekini()
+        if self.igralec_2 is not None:
+            self.igralec_2.prekini()
+        self.master.destroy()
 
     def o_igri(self):
         """Ustvari okno s podatki o igri."""
@@ -262,7 +273,7 @@ class GUI():
         # Ustvari objekt razreda Igra() iz logike igre.
         self.igra = game_logic.Igra()
 
-        # Pobirisi zetone, ki so ostali na plosci.
+        # Pobrisi zetone, ki so ostali na plosci.
         self.plosca.delete("zeton")
         self.plosca.delete("pojeden")
 
@@ -303,6 +314,7 @@ class GUI():
         self.plosca.itemconfig("zeton", state="disabled")
 
     def prestavi_zeton(self, zeton, polje):
+        """Prestavi narisan zeton na izbrano polje."""
         for (x, y), koordinata in self.koordinate.items():
             if koordinata == polje:
                 a, b, c, d = self.plosca.coords(self.narisani_zetoni[zeton])
@@ -318,9 +330,11 @@ class GUI():
         """Ustrezno ukrepaj ob kliku na ploščo."""
         polmer_klika = 0.3 * GUI.VELIKOST_ODSEKA
 
+        # Pomožna funkcija za izračun razdalje med dvema točkama.
         def razdalja(x1, y1, x2, y2):
             return (x1 - x2) ** 2 + (y1 - y2) ** 2
 
+        # Najprej preveri, če je bil kliknjen žeton.
         for id_zetona in range(18):
             a, b, c, d = self.plosca.coords(self.narisani_zetoni[id_zetona])
             if self.plosca.itemcget(self.narisani_zetoni[id_zetona], "state") == "normal" and \
@@ -332,6 +346,7 @@ class GUI():
                     self.igralec_2.klik(id_zetona, "ZETON")
                     return
 
+        # Nato preveri, če je bilo kliknjeno polje na plošči.
         for krizisce in self.koordinate:
             a, b = krizisce
             if razdalja(a, b, event.x, event.y) <= polmer_klika ** 2:
@@ -344,7 +359,7 @@ class GUI():
 
     def povleci_potezo(self, vrsta_poteze, zeton, polje=None):
         """Sprejme vrsto_poteze (PREMAKNI ali JEMLJI), zeton in po moznosti se polje (za PREMAKNI) ter odigra potezo.
-        Veljavnost poteze je preverila ze metoda klik
+        Veljavnost poteze je preverila ze metoda klik.
         :param vrsta_poteze: kaksne vrste potezo naj povlece "VZEMI" ali "PREMAKNI"
         :param zeton: pri "PREMAKNI" je to id zetona, ki bo premaknjen, pri "VZEMI" pa tak, ki bo pojeden
         :param polje: pri "PREMAKNI" je to koordinata polja, kamor bo premaknjen zeton
@@ -389,9 +404,9 @@ class Clovek():
     def __init__(self, gui, tezavnost):
         """Objekt razreda Clovek povezemo z igralno plosco in naredimo atribute, ki bodo hranili klike"""
         self.gui = gui
-        self.prvi_klik = None
-        self.drugi_klik = None
-        self.tretji_klik = None
+        self.prvi_klik = None        # Prvi klik, ki pove kateri žeton želimo premakniti.
+        self.drugi_klik = None       # Drugi klik, ki pove na katero polje želimo premakniti žeton.
+        self.tretji_klik = None      # Tretji klik, ki pove kateri žeton želimo vzeti (če je to potrebno).
 
     def igraj(self):
         """Poklice se, takoj ko pride igralec Clovek na vrsto - takrat resetiramo vse klike iz prejsnje rotacije"""
@@ -406,7 +421,7 @@ class Clovek():
         """
 
         def ponastavi_barve_zetonov():
-            """Ponastavi barve vseh žetonov na običajne vrednosti"""
+            """Ponastavi barve vseh žetonov na običajne vrednosti."""
             for krogec in self.gui.narisani_zetoni[:9]:
                 self.gui.plosca.itemconfig(krogec, fill=GUI.BARVA_IGRALEC_1)
             for krogec in self.gui.narisani_zetoni[9:]:
@@ -418,7 +433,7 @@ class Clovek():
             self.prvi_klik = koordinata
 
             # Obarvanje žetona ob kliku.
-            # Najprej ponastavi barve vseh žetonov, zatem preveri, če je na potezi prvi igralec in je izbran žeton
+            # Najprej ponastavi barve vseh žetonov, za tem preveri, če je na potezi prvi igralec in je izbran žeton
             # njegov, ter ga pobarva če je, nato enako stori za drugega igralca.
             ponastavi_barve_zetonov()
             if self.gui.igra.na_potezi == game_logic.IGRALEC_1 and koordinata < 9 and \
@@ -450,19 +465,19 @@ class Racunalnik():
     def __init__(self, gui, tezavnost):
         """Objekt razreda Racunalnik povezemo z igralno plosco"""
         self.gui = gui
-        self.algoritem = Alfabeta(tezavnost)
+        self.algoritem = Alfabeta(tezavnost)    # Izbrani algoritem za računalnik.
         self.mislec = None
 
     def igraj(self):
         """Poklice se, takoj ko pride igralec Racunalnik na vrsto"""
-        # Naredimo vlakno, ki mu podamo *kopijo* igre (da ne bo zmedel GUIja):
+        # Naredimo vlakno, ki igra na kopiji igre.
         self.mislec = threading.Thread(
             target=lambda: self.algoritem.izracunaj_potezo(self.gui.igra.kopija_igre()))
 
-        # Poženemo vlakno:
+        # Poženemo vlakno.
         self.mislec.start()
 
-        # Gremo preverjat, ali je bila najdena poteza:
+        # Gremo preverjat, ali je bila najdena poteza.
         self.gui.plosca.after(100, self.preveri_potezo)
 
     def preveri_potezo(self):
@@ -475,6 +490,7 @@ class Racunalnik():
                     self.gui.povleci_potezo("PREMAKNI", a, b)
                 else:
                     self.gui.povleci_potezo("PREMAKNI", a, b)
+                    # Časovni zamik, da poteza PREMAKNI in VZEMI nista istočasni.
                     self.gui.plosca.after(1000, lambda: self.gui.povleci_potezo("VZEMI", c))
                 # Vzporedno vlakno ni več aktivno, zato ga "pozabimo"
                 self.mislec = None
@@ -497,16 +513,14 @@ class Racunalnik():
 
 
 class Alfabeta():
-    # Algoritem alfabeta predstavimo z objektom, ki hrani stanje igre in
-    # algoritma, nima pa dostopa do GUI (ker ga ne sme uporabljati, saj deluje
-    # v drugem vlaknu kot tkinter).
+    """Objekt razreda Alfabeta deluje na kopiji igre in v vzporednem vlaknu."""
 
     def __init__(self, globina):
-        self.globina = globina        # do katere globine iščemo?
-        self.prekinitev = False       # ali moramo končati?
-        self.igra = None              # objekt, ki opisuje igro (ga dobimo kasneje)
-        self.jaz = None               # katerega igralca igramo (podatek dobimo kasneje)
-        self.poteza = None            # sem napišemo potezo, ko jo najdemo
+        self.globina = globina        # Maksimalna globina iskanja.
+        self.prekinitev = False       # Če je True, moramo prekiniti z razmišljanjem.
+        self.igra = None              # Objekt, ki vsebuje podatke o igri.
+        self.jaz = None               # Igralec za katerega maksimiziramo.
+        self.poteza = None            # Sem zapišemo potezo najboljšo potezo.
 
     def prekini(self):
         """Metoda, ki jo pokliče GUI, če je treba nehati razmišljati, ker
@@ -537,35 +551,29 @@ class Alfabeta():
             self.poteza = poteza
 
     # Vrednosti igre
-    ZMAGA = 100000           # Mora biti vsaj 10^5
-    NESKONCNO = ZMAGA + 1    # Več kot zmaga
+    ZMAGA = 100000
+    NESKONCNO = ZMAGA + 1
 
     def vrednost_pozicije(self):
-        """Ocena vrednosti pozicije"""
+        """Ocena vrednosti pozicije."""
         vrednosti = self.igra.ocena_postavitve()
+
+        if self.igra.faza_igre == 1:
+            # S pomočjo koeficientov ovrednotimo oceno razlike, ki smo jih izračunali v oceni postavitve.
+            koeficienti = (26, 1, 6, 12, 7, 1, 0)
+        elif self.igra.zetoni[:9].count('izlocen') >= 6:
+            koeficienti = (0, 0, 0, 10, 1, 0, 7)
+        else:
+            koeficienti = (43, 10, 8, 0, 0, 0, 0)
+        ocena = 0
+        # Izračuna uteženo vsoto iz danih koeficientov.
+        for i in range(7):
+            ocena += koeficienti[i] * vrednosti[i]
         if self.jaz is game_logic.IGRALEC_1:
-            if self.igra.faza_igre == 1:
-                koeficienti = (26, 1, 6, 12, 7, 1, 0)
-            elif self.igra.zetoni[:9].count('izlocen') >= 6:
-                koeficienti = (0, 0, 0, 10, 1, 0, 7)
-            else:
-                koeficienti = (43, 10, 8, 0, 0, 0, 0)
-            ocena = 0
-            for i in range(7):
-                ocena += koeficienti[i] * vrednosti[i]
             return ocena
         else:
-            if self.igra.faza_igre == 1:
-                # koeficienti = (0,0,1,0,0)
-                koeficienti = (26, 1, 6, 12, 7, 1, 0)
-            elif self.igra.zetoni[9:].count('izlocen') >= 6:
-                koeficienti = (0, 0, 0, 10, 1, 0, 7)
-            else:
-                koeficienti = (43, 10, 8, 0, 0, 0, 0)
-            ocena = 0
-            for i in range(7):
-                ocena += koeficienti[i] * vrednosti[i]
-            return -ocena
+            return -ocena        # Ocena postavitve je narejena za prvega igralca, če je na potezi drugi vrnemo
+                                 # nasprotno vrednost.
 
     def alfabeta(self, globina, alfa, beta, maksimiziramo):
         """Glavna metoda alfabeta.
@@ -595,20 +603,27 @@ class Alfabeta():
                     najboljsa_poteza = (None, None, None)
                     vrednost_najboljse = -Alfabeta.NESKONCNO
                     poteze = self.igra.veljavne_poteze()
+
+                    # Naključno premeša poteze, da so enakovredne poteze enako verjetno odigrane.
                     random.shuffle(poteze)
                     for zeton, polje in poteze:
                         self.igra.odigraj_potezo(zeton, polje)
+                        # Če je konec poteze, ni potrebno vzeti žetona.
                         if self.igra.konec_poteze:
+                            # Potezo smo zaključili, zato nastavimo konec poteze na False, preden naredimo novo stopnjo alfabeta.
                             self.igra.konec_poteze = False
                             vrednost = self.alfabeta(globina - 1, alfa, beta, not maksimiziramo)[1]
                             self.igra.razveljavi()
+                            # Našli smo boljšo potezo, kot smo jo imeli do sedaj.
                             if vrednost > vrednost_najboljse:
                                 vrednost_najboljse = vrednost
                                 najboljsa_poteza = (zeton, polje, None)
                             if vrednost > alfa:
                                 alfa = vrednost
+                            # če vemo, da bomo dobili manj od do sedaj že zagotovljene vrednosti, prekinemo.
                             if beta <= alfa:
                                 break
+                        # Poteze še ni konec, vzeti moramo še nasprotnikov žeton.
                         else:
                             for zeton_1 in self.igra.veljavni_zakljucki():
                                 self.igra.zakljucek_poteze(zeton_1)
@@ -674,5 +689,5 @@ if __name__ == "__main__":
     # Ustvarimo objekt razreda GUI in ga pospravimo
     aplikacija = GUI(root)
 
-    # Mainloop nadzira glavno okno in se neha izvajati ko okno zapremo
+    # Mainloop nadzira glavno okno in se neha izvajati, ko okno zapremo
     root.mainloop()

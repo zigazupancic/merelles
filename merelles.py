@@ -96,6 +96,7 @@ class GUI():
         self.nova_igra(Clovek, Clovek)
 
     def o_igri(self):
+        """Ustvari okno s podatki o igri."""
 
         def preklici():
             """Pomožna funkcija, ki zapre okno in nastavi atribut self.about na None."""
@@ -126,6 +127,7 @@ class GUI():
                  justify="left").grid(row=2, column=0)
 
     def pomoc(self):
+        """Ustvari okno s pomočjo pri igranju igre."""
 
         def preklici():
             """Pomožna funkcija, ki zapre okno in nastavi atribut self.help na None."""
@@ -244,6 +246,8 @@ class GUI():
                   command=lambda: ustvari_igro()).grid(row=9, column=3, columnspan=3, sticky="E")
 
     def nova_igra(self, igralec_1, igralec_2, tezavnost=2):
+        """Ustvari novo igro s težavnostjo tezavnost in objekta razredov igralec_1 in igralec_2."""
+
         d = GUI.VELIKOST_ODSEKA
 
         if self.igralec_1 is not None:
@@ -251,14 +255,18 @@ class GUI():
         if self.igralec_2 is not None:
             self.igralec_2.prekini()
 
+        # Ustvari objekte razredov igralec_1 in igralec_2.
         self.igralec_1 = igralec_1(self, tezavnost)
         self.igralec_2 = igralec_2(self, tezavnost)
+
+        # Ustvari objekt razreda Igra() iz logike igre.
         self.igra = game_logic.Igra()
 
-        # Pobirisi zetone, ki so ostali na plosci
+        # Pobirisi zetone, ki so ostali na plosci.
         self.plosca.delete("zeton")
         self.plosca.delete("pojeden")
 
+        # Nariši žetone obeh igralcev.
         self.narisani_zetoni = []
         for zeton in range(5):
             self.narisani_zetoni.append(self.plosca.create_oval(
@@ -284,6 +292,7 @@ class GUI():
         self.igralec_1.igraj()
 
     def koncaj_igro(self, zmagovalec):
+        """Konča igro in izpiše zmagovalca."""
         if zmagovalec is game_logic.IGRALEC_1:
             self.napis.set("Zmagovalec je {}. Nova igra?".format(self.ime_1))
         elif zmagovalec is game_logic.IGRALEC_2:
@@ -302,9 +311,11 @@ class GUI():
                 return
 
     def odstrani_zeton(self, zeton):
+        """Nastavi tag žetonu zeton na "pojeden"."""
         self.plosca.itemconfig(self.narisani_zetoni[zeton], state="hidden", tags="pojeden")
 
     def klik_na_plosco(self, event):
+        """Ustrezno ukrepaj ob kliku na ploščo."""
         polmer_klika = 0.3 * GUI.VELIKOST_ODSEKA
 
         def razdalja(x1, y1, x2, y2):
@@ -657,6 +668,7 @@ class Alfabeta():
 if __name__ == "__main__":
     # Ustvarimo glavno okno igre
     root = tk.Tk()
+    # Ime okna
     root.title("Merelles")
 
     # Ustvarimo objekt razreda GUI in ga pospravimo
